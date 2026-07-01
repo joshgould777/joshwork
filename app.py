@@ -227,9 +227,8 @@ def chat():
 @app.route("/analyze-face", methods=["POST"])
 def analyze_face():
     """Analyze face photos for golden ratio proportions and provide recommendations."""
-    try:
-        # Check for front photo (required)
-        if "front_image" not in request.files:
+    # Check for front photo (required)
+    if "front_image" not in request.files:
         return jsonify({"error": "Front-facing photo is required"}), 400
 
     front_image = request.files["front_image"]
