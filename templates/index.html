@@ -947,6 +947,43 @@
             color: #00ff88;
         }
 
+        .scan-progress {
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .scan-progress .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .scan-progress .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #0f3460;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .scan-progress .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffaa);
+            border-radius: 4px;
+            transition: width 1s linear;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .scan-progress .eta {
+            text-align: center;
+            margin-top: 0.5rem;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
         /* Rating Reveal Animation */
         .rating-reveal {
             display: flex;
@@ -1643,8 +1680,14 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         // Scanning animation functions
         let scanningInterval = null;
         let dotsInterval = null;
+        let progressInterval = null;
+        let elapsedInterval = null;
+        let scanStartTime = null;
+        const ESTIMATED_TIME = 45; // seconds
 
         function startScanningAnimation() {
+            scanStartTime = Date.now();
+
             let dotCount = 0;
             dotsInterval = setInterval(() => {
                 dotCount = (dotCount + 1) % 4;
@@ -1663,13 +1706,55 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 if (harmEl) harmEl.textContent = (70 + Math.random() * 20).toFixed(1) + '%';
                 if (ptsEl) ptsEl.textContent = Math.floor(50 + Math.random() * 30);
             }, 150);
+
+            // Progress bar animation
+            progressInterval = setInterval(() => {
+                const elapsed = (Date.now() - scanStartTime) / 1000;
+                // Progress goes to 90% over estimated time, then slows down
+                let progress;
+                if (elapsed < ESTIMATED_TIME) {
+                    progress = (elapsed / ESTIMATED_TIME) * 90;
+                } else {
+                    // Slow crawl from 90% to 99% for overtime
+                    progress = 90 + Math.min(9, (elapsed - ESTIMATED_TIME) / 10);
+                }
+
+                const progressFill = document.getElementById('progress-fill');
+                const progressPercent = document.getElementById('progress-percent');
+
+                if (progressFill) progressFill.style.width = progress.toFixed(1) + '%';
+                if (progressPercent) progressPercent.textContent = Math.floor(progress) + '%';
+            }, 500);
+
+            // Elapsed time counter
+            elapsedInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - scanStartTime) / 1000);
+                const remaining = Math.max(0, ESTIMATED_TIME - elapsed);
+
+                const elapsedEl = document.getElementById('elapsed-time');
+                const etaEl = document.getElementById('eta-text');
+
+                if (elapsedEl) elapsedEl.textContent = `Elapsed: ${elapsed}s`;
+                if (etaEl) {
+                    if (remaining > 0) {
+                        etaEl.textContent = `Estimated remaining: ~${remaining}s`;
+                    } else {
+                        etaEl.textContent = 'Finalizing analysis...';
+                    }
+                }
+            }, 1000);
         }
 
         function stopScanningAnimation() {
             if (scanningInterval) clearInterval(scanningInterval);
             if (dotsInterval) clearInterval(dotsInterval);
+            if (progressInterval) clearInterval(progressInterval);
+            if (elapsedInterval) clearInterval(elapsedInterval);
             scanningInterval = null;
             dotsInterval = null;
+            progressInterval = null;
+            elapsedInterval = null;
+            scanStartTime = null;
         }
 
         function extractOverallRating(analysisText) {
@@ -1830,6 +1915,20 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                         <div class="scan-stat"><span class="label">HARMONY:</span> <span id="stat-harm">---%</span></div>
                         <div class="scan-stat"><span class="label">POINTS:</span> <span id="stat-pts">---</span></div>
                     </div>
+                    <div class="scan-progress">
+                        <div class="progress-label">
+                            <span>PROCESSING</span>
+                            <span id="progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="eta">
+                            <span id="eta-text">Estimated time: ~45 seconds</span>
+                            <br>
+                            <span id="elapsed-time">Elapsed: 0s</span>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -1858,16 +1957,22 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 clearTimeout(timeoutId);
                 const data = await response.json();
 
+                // Stop all animations and clear the scanning display
                 stopScanningAnimation();
 
                 if (data.error) {
+                    // Completely clear and show error
                     analysisResult.innerHTML = `
                         <div class="analysis-placeholder">
-                            <div class="icon" style="color: #e94560;">⚠️</div>
-                            <h2>Analysis Error</h2>
-                            <p>${data.error}</p>
+                            <div class="icon" style="color: #e94560; font-size: 4rem;">⚠️</div>
+                            <h2 style="color: #e94560;">Analysis Error</h2>
+                            <p style="max-width: 500px; margin: 1rem auto;">${data.error}</p>
+                            <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">Try Again</button>
                         </div>
                     `;
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = 'Analyze My Face';
+                    return;
                 } else {
                     // Store analysis data
                     analysisData = data;
