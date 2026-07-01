@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude Chatbot</title>
+    <title>LooksMax AI - Facial Analysis & Knowledge Base</title>
     <style>
         * {
             margin: 0;
@@ -27,14 +27,22 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #0f3460;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #e94560;
         }
 
-        #clear-btn {
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
             background: #0f3460;
             color: #eee;
             border: none;
@@ -42,13 +50,165 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.2s;
+            font-size: 0.9rem;
         }
 
-        #clear-btn:hover {
+        .btn:hover {
             background: #e94560;
         }
 
-        #chat-container {
+        .btn-primary {
+            background: #e94560;
+        }
+
+        .btn-primary:hover {
+            background: #ff6b6b;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37, #f4e4ba);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #f4e4ba, #d4af37);
+        }
+
+        .btn-camera {
+            background: #2d6a4f;
+        }
+
+        .btn-camera:hover {
+            background: #40916c;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            background: #16213e;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: #0f3460;
+        }
+
+        .tab.active {
+            border-bottom-color: #e94560;
+            color: #e94560;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: 300px;
+            background: #16213e;
+            border-right: 1px solid #0f3460;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #sidebar.hidden {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #0f3460;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1rem;
+            color: #e94560;
+        }
+
+        #file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .file-item {
+            padding: 0.75rem;
+            background: #1a1a2e;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .file-item .filename {
+            color: #eee;
+            word-break: break-all;
+        }
+
+        .file-item .filesize {
+            color: #888;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .upload-area {
+            padding: 1rem;
+            border-top: 1px solid #0f3460;
+        }
+
+        #file-input, #face-input {
+            display: none;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed #0f3460;
+            border-radius: 5px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        #chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #chat-container, #analysis-result {
             flex: 1;
             overflow-y: auto;
             padding: 2rem;
@@ -81,6 +241,18 @@
             background: #16213e;
             align-self: flex-start;
             color: #888;
+        }
+
+        .citations {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #0f3460;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .citations strong {
+            color: #e94560;
         }
 
         #input-container {
@@ -126,34 +298,404 @@
             background: #555;
             cursor: not-allowed;
         }
+
+        .status-message {
+            padding: 0.75rem 1rem;
+            background: #0f3460;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .status-message.success {
+            background: #1e5128;
+        }
+
+        .status-message.error {
+            background: #5c1a1a;
+        }
+
+        /* Face Analysis Tab */
+        .face-analysis-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .face-upload-section {
+            width: 350px;
+            background: #16213e;
+            border-right: 1px solid #0f3460;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        .face-upload-section h2 {
+            color: #e94560;
+            font-size: 1.2rem;
+        }
+
+        .capture-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .capture-options .btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .face-preview {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #1a1a2e;
+            border: 2px dashed #0f3460;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .face-preview:hover {
+            border-color: #e94560;
+        }
+
+        .face-preview img, .face-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .face-preview video {
+            transform: scaleX(-1); /* Mirror the video */
+        }
+
+        .face-preview-placeholder {
+            text-align: center;
+            color: #888;
+            padding: 1rem;
+        }
+
+        .face-preview-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Camera controls overlay */
+        .camera-controls {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .camera-controls .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .capture-btn {
+            background: #e94560;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid white;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .capture-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .capture-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tips-box {
+            background: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .tips-box h3 {
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .tips-box ul {
+            margin-left: 1.2rem;
+            color: #aaa;
+        }
+
+        .tips-box li {
+            margin-bottom: 0.3rem;
+        }
+
+        #analysis-result {
+            flex: 1;
+            background: #1a1a2e;
+        }
+
+        .analysis-content {
+            background: #16213e;
+            padding: 2rem;
+            border-radius: 10px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .analysis-content h1, .analysis-content h2, .analysis-content h3 {
+            color: #e94560;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-content h1:first-child, .analysis-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .analysis-placeholder {
+            text-align: center;
+            color: #666;
+            padding: 4rem 2rem;
+        }
+
+        .analysis-placeholder .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #d4af37;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #888;
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: absolute;
+                z-index: 100;
+                height: 100%;
+            }
+
+            .face-analysis-container {
+                flex-direction: column;
+            }
+
+            .face-upload-section {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #0f3460;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Claude Chatbot</h1>
-        <button id="clear-btn">Clear Chat</button>
+        <h1>LooksMax AI</h1>
+        <div class="header-buttons">
+            <button id="toggle-sidebar" class="btn">Files</button>
+            <button id="sync-btn" class="btn btn-primary">Sync KB</button>
+            <button id="clear-btn" class="btn">Clear</button>
+        </div>
     </header>
 
-    <div id="chat-container"></div>
+    <div class="tabs">
+        <div class="tab active" data-tab="chat">Knowledge Base Chat</div>
+        <div class="tab" data-tab="analyze">Face Analysis</div>
+    </div>
 
-    <div id="input-container">
-        <textarea id="message-input" placeholder="Type your message..." rows="1"></textarea>
-        <button id="send-btn">Send</button>
+    <!-- Chat Tab -->
+    <div id="chat-tab" class="tab-content active">
+        <div id="main-content">
+            <div id="sidebar" class="hidden">
+                <div class="sidebar-header">
+                    <h2>Knowledge Base Files</h2>
+                    <button id="refresh-files" class="btn">Refresh</button>
+                </div>
+                <div id="file-list"></div>
+                <div class="upload-area">
+                    <input type="file" id="file-input" accept=".pdf,.txt,.html,.md,.csv,.doc,.docx,.json">
+                    <label for="file-input" class="upload-btn">
+                        Click to upload documents<br>
+                        <small>PDF, TXT, HTML, MD, CSV, DOC, JSON</small>
+                    </label>
+                </div>
+            </div>
+
+            <div id="chat-area">
+                <div id="chat-container">
+                    <div class="message assistant">
+                        Welcome to LooksMax AI! I'm powered by a knowledge base about facial aesthetics, skincare, the golden ratio, and facial development. Ask me anything about:
+
+- Skincare routines and peptides
+- The golden ratio and facial proportions
+- Mewing and facial exercises
+- Cosmetic procedures
+- Infant facial development
+
+Or switch to the "Face Analysis" tab to upload a photo for personalized recommendations!
+                    </div>
+                </div>
+
+                <div id="input-container">
+                    <textarea id="message-input" placeholder="Ask about skincare, facial harmony, procedures..." rows="1"></textarea>
+                    <button id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Face Analysis Tab -->
+    <div id="analyze-tab" class="tab-content">
+        <div class="face-analysis-container">
+            <div class="face-upload-section">
+                <h2>Capture Your Photo</h2>
+
+                <div class="capture-options">
+                    <button id="upload-btn" class="btn">Upload File</button>
+                    <button id="camera-btn" class="btn btn-camera">Use Camera</button>
+                </div>
+
+                <input type="file" id="face-input" accept="image/jpeg,image/png,image/webp,image/gif">
+
+                <div class="face-preview" id="face-preview">
+                    <div class="face-preview-placeholder">
+                        <div class="icon">📸</div>
+                        <p>Upload a photo or use your camera</p>
+                        <small>JPG, PNG, WebP supported</small>
+                    </div>
+                </div>
+
+                <!-- Hidden canvas for capturing photo -->
+                <canvas id="capture-canvas" style="display: none;"></canvas>
+
+                <button id="analyze-btn" class="btn btn-gold" disabled>
+                    Analyze My Face
+                </button>
+
+                <div class="tips-box">
+                    <h3>Tips for Best Results:</h3>
+                    <ul>
+                        <li>Face the camera directly</li>
+                        <li>Good, even lighting</li>
+                        <li>Neutral expression</li>
+                        <li>Hair pulled back from face</li>
+                        <li>No filters or heavy makeup</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="analysis-result">
+                <div class="analysis-placeholder">
+                    <div class="icon">✨</div>
+                    <h2>Golden Ratio Analysis</h2>
+                    <p>Upload a photo or use your camera to receive personalized recommendations<br>based on facial proportions and the golden ratio (φ = 1.618)</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-tab`) {
+                        content.classList.add('active');
+                    }
+                });
+
+                // Stop camera when switching away from analyze tab
+                if (tabId !== 'analyze' && cameraStream) {
+                    stopCamera();
+                }
+            });
+        });
+
+        // Chat functionality
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
         const clearBtn = document.getElementById('clear-btn');
+        const syncBtn = document.getElementById('sync-btn');
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const refreshFiles = document.getElementById('refresh-files');
 
-        function addMessage(content, role) {
+        // Face analysis elements
+        const faceInput = document.getElementById('face-input');
+        const facePreview = document.getElementById('face-preview');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const analysisResult = document.getElementById('analysis-result');
+        const uploadBtn = document.getElementById('upload-btn');
+        const cameraBtn = document.getElementById('camera-btn');
+        const captureCanvas = document.getElementById('capture-canvas');
+
+        let selectedFaceFile = null;
+        let cameraStream = null;
+        let videoElement = null;
+
+        function addMessage(content, role, citations = []) {
             const div = document.createElement('div');
             div.className = `message ${role}`;
             div.textContent = content;
+
+            if (citations.length > 0) {
+                const citDiv = document.createElement('div');
+                citDiv.className = 'citations';
+                citDiv.innerHTML = '<strong>Sources:</strong> ' + citations.map(c => {
+                    const filename = c.split('/').pop();
+                    return filename;
+                }).join(', ');
+                div.appendChild(citDiv);
+            }
+
             chatContainer.appendChild(div);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             return div;
+        }
+
+        function addStatus(message, type = '') {
+            const div = document.createElement('div');
+            div.className = `status-message ${type}`;
+            div.textContent = message;
+            fileList.insertBefore(div, fileList.firstChild);
+            setTimeout(() => div.remove(), 5000);
         }
 
         async function sendMessage() {
@@ -164,7 +706,7 @@
             sendBtn.disabled = true;
 
             addMessage(message, 'user');
-            const typingDiv = addMessage('Thinking...', 'typing');
+            const typingDiv = addMessage('Searching knowledge base...', 'typing');
 
             try {
                 const response = await fetch('/chat', {
@@ -179,7 +721,7 @@
                 if (data.error) {
                     addMessage('Error: ' + data.error, 'assistant');
                 } else {
-                    addMessage(data.response, 'assistant');
+                    addMessage(data.response, 'assistant', data.citations || []);
                 }
             } catch (error) {
                 typingDiv.remove();
@@ -190,13 +732,308 @@
             messageInput.focus();
         }
 
-        async function clearChat() {
-            await fetch('/clear', { method: 'POST' });
-            chatContainer.innerHTML = '';
+        async function loadFiles() {
+            try {
+                const response = await fetch('/files');
+                const data = await response.json();
+
+                fileList.innerHTML = '';
+                if (data.files && data.files.length > 0) {
+                    data.files.forEach(file => {
+                        const div = document.createElement('div');
+                        div.className = 'file-item';
+                        div.innerHTML = `
+                            <div class="filename">${file.name}</div>
+                            <div class="filesize">${formatSize(file.size)}</div>
+                        `;
+                        fileList.appendChild(div);
+                    });
+                } else {
+                    fileList.innerHTML = '<div class="file-item"><em>No files uploaded yet</em></div>';
+                }
+            } catch (error) {
+                fileList.innerHTML = '<div class="file-item error">Failed to load files</div>';
+            }
         }
 
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                addStatus('Uploading ' + file.name + '...');
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    addStatus('Error: ' + data.error, 'error');
+                } else {
+                    addStatus(data.message, 'success');
+                    loadFiles();
+                }
+            } catch (error) {
+                addStatus('Upload failed', 'error');
+            }
+        }
+
+        async function syncKnowledgeBase() {
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Syncing...';
+
+            try {
+                const response = await fetch('/sync', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.error) {
+                    addStatus('Sync error: ' + data.error, 'error');
+                } else {
+                    addStatus(data.message, 'success');
+                }
+            } catch (error) {
+                addStatus('Sync failed', 'error');
+            }
+
+            syncBtn.disabled = false;
+            syncBtn.textContent = 'Sync KB';
+        }
+
+        async function clearChat() {
+            await fetch('/clear', { method: 'POST' });
+            chatContainer.innerHTML = '<div class="message assistant">Chat cleared. Ask me anything about facial aesthetics!</div>';
+        }
+
+        // Camera Functions
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                // Create video element
+                videoElement = document.createElement('video');
+                videoElement.srcObject = cameraStream;
+                videoElement.autoplay = true;
+                videoElement.playsInline = true;
+
+                // Create camera controls
+                const controls = document.createElement('div');
+                controls.className = 'camera-controls';
+                controls.innerHTML = `
+                    <button class="capture-btn" id="take-photo-btn" title="Take Photo"></button>
+                    <button class="btn" id="cancel-camera-btn">Cancel</button>
+                `;
+
+                // Clear preview and add video
+                facePreview.innerHTML = '';
+                facePreview.appendChild(videoElement);
+                facePreview.appendChild(controls);
+                facePreview.style.cursor = 'default';
+
+                // Add event listeners
+                document.getElementById('take-photo-btn').addEventListener('click', capturePhoto);
+                document.getElementById('cancel-camera-btn').addEventListener('click', stopCamera);
+
+                cameraBtn.textContent = 'Camera Active';
+                cameraBtn.disabled = true;
+
+            } catch (error) {
+                console.error('Camera error:', error);
+                alert('Could not access camera. Please make sure you have granted camera permissions.');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            facePreview.innerHTML = `
+                <div class="face-preview-placeholder">
+                    <div class="icon">📸</div>
+                    <p>Upload a photo or use your camera</p>
+                    <small>JPG, PNG, WebP supported</small>
+                </div>
+            `;
+            facePreview.style.cursor = 'pointer';
+
+            cameraBtn.textContent = 'Use Camera';
+            cameraBtn.disabled = false;
+            analyzeBtn.disabled = true;
+            selectedFaceFile = null;
+        }
+
+        function capturePhoto() {
+            if (!videoElement) return;
+
+            // Set canvas size to video size
+            captureCanvas.width = videoElement.videoWidth;
+            captureCanvas.height = videoElement.videoHeight;
+
+            // Draw video frame to canvas (flip horizontally to match mirror view)
+            const ctx = captureCanvas.getContext('2d');
+            ctx.translate(captureCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(videoElement, 0, 0);
+
+            // Convert to blob
+            captureCanvas.toBlob((blob) => {
+                selectedFaceFile = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+
+                // Show captured image
+                const imgUrl = URL.createObjectURL(blob);
+                facePreview.innerHTML = `<img src="${imgUrl}" alt="Captured photo">`;
+                facePreview.style.cursor = 'pointer';
+
+                // Stop camera stream
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+
+                cameraBtn.textContent = 'Use Camera';
+                cameraBtn.disabled = false;
+                analyzeBtn.disabled = false;
+
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Face Analysis Functions
+        uploadBtn.addEventListener('click', () => {
+            faceInput.click();
+        });
+
+        cameraBtn.addEventListener('click', () => {
+            if (cameraStream) {
+                stopCamera();
+            } else {
+                startCamera();
+            }
+        });
+
+        facePreview.addEventListener('click', () => {
+            if (!cameraStream && !facePreview.querySelector('img')) {
+                faceInput.click();
+            }
+        });
+
+        faceInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Stop camera if running
+                if (cameraStream) {
+                    stopCamera();
+                }
+
+                selectedFaceFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    facePreview.innerHTML = `<img src="${e.target.result}" alt="Face preview">`;
+                    analyzeBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function analyzeFace() {
+            if (!selectedFaceFile) return;
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
+
+            analysisResult.innerHTML = `
+                <div class="analysis-placeholder">
+                    <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
+                    <h2>Analyzing Your Face...</h2>
+                    <p>This may take 15-30 seconds</p>
+                </div>
+            `;
+
+            const formData = new FormData();
+            formData.append('image', selectedFaceFile);
+
+            try {
+                const response = await fetch('/analyze-face', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    analysisResult.innerHTML = `
+                        <div class="analysis-placeholder">
+                            <div class="icon" style="color: #e94560;">⚠️</div>
+                            <h2>Analysis Error</h2>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                } else {
+                    // Format the analysis with markdown-like styling
+                    const formattedAnalysis = formatAnalysis(data.analysis);
+                    analysisResult.innerHTML = `<div class="analysis-content">${formattedAnalysis}</div>`;
+                }
+            } catch (error) {
+                analysisResult.innerHTML = `
+                    <div class="analysis-placeholder">
+                        <div class="icon" style="color: #e94560;">⚠️</div>
+                        <h2>Connection Error</h2>
+                        <p>Failed to connect to server. Please try again.</p>
+                    </div>
+                `;
+            }
+
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = 'Analyze My Face';
+        }
+
+        function formatAnalysis(text) {
+            // Convert markdown-like formatting to HTML
+            let html = text
+                .replace(/### (.*)/g, '<h3>$1</h3>')
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/# (.*)/g, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/---/g, '<hr>')
+                .replace(/\n/g, '<br>');
+            return html;
+        }
+
+        analyzeBtn.addEventListener('click', analyzeFace);
+
+        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         clearBtn.addEventListener('click', clearChat);
+        syncBtn.addEventListener('click', syncKnowledgeBase);
+        refreshFiles.addEventListener('click', loadFiles);
+
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            if (!sidebar.classList.contains('hidden')) {
+                loadFiles();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                uploadFile(e.target.files[0]);
+                e.target.value = '';
+            }
+        });
 
         messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
