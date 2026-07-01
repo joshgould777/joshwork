@@ -23,77 +23,86 @@ VISION_MODEL_ID = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'html', 'md', 'csv', 'doc', 'docx', 'json'}
 IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
 
-FACIAL_ANALYSIS_PROMPT = """You are an expert facial aesthetics analyst specializing in the golden ratio (phi = 1.618) and facial harmony. Analyze this face photo and provide detailed, actionable recommendations.
+FACIAL_ANALYSIS_PROMPT = """You are an expert facial aesthetics analyst specializing in the golden ratio (phi = 1.618) and facial harmony. You have been provided with {photo_description}. The person is {age} years old.
 
-## Your Analysis Should Include:
+## IMPORTANT: Structure your response EXACTLY as follows:
 
-### 1. FACIAL PROPORTIONS ASSESSMENT
-Evaluate the face against ideal proportions:
-- **Vertical Thirds**: Is the face evenly divided into thirds (hairline to brows, brows to nose base, nose base to chin)?
-- **Horizontal Fifths**: Are the five vertical sections equal (outer face to outer eye, eye width, between eyes, eye width, outer eye to outer face)?
-- **Golden Ratio Relationships**: Check key phi (1.618) relationships
+### PROS - Your Strengths (Features That Excel)
 
-### 2. FEATURE-BY-FEATURE ANALYSIS
+Rate each strong feature on a scale of 1-10 and explain why it's a strength:
 
-**Forehead:**
-- Proportion relative to face
-- Shape and symmetry
+**[Feature Name]: [X/10]**
+- Description of why this feature is strong
+- How it contributes to overall harmony
 
-**Eyes:**
-- Width relative to face (should be 1/5 of face width)
-- Distance between eyes (should equal one eye width)
-- Shape and symmetry
-
-**Nose:**
-- Width (should equal eye width at alar base)
-- Length relative to middle third
-- Profile angle if visible
-
-**Lips:**
-- Upper to lower lip ratio (ideal is 1:1.6)
-- Width relative to nose (should be 1.5x nose width)
-- Symmetry
-
-**Chin/Jaw:**
-- Chin projection
-- Jaw definition
-- Lower third proportion
-
-**Cheekbones:**
-- Projection and definition
-- Facial diamond shape
-
-**Overall Symmetry:**
-- Left vs right side comparison
-- Notable asymmetries
-
-### 3. PERSONALIZED RECOMMENDATIONS
-
-Based on your analysis, provide specific recommendations in these categories:
-
-**Non-Invasive Options:**
-- Skincare focus areas
-- Makeup/contouring techniques
-- Facial exercises (if applicable)
-
-**Minimally Invasive Options:**
-- Specific filler placement recommendations
-- Botox considerations
-- Thread lift areas
-
-**Surgical Options (if significant changes desired):**
-- Procedures that could enhance harmony
-
-### 4. PRIORITY RANKING
-List the top 3-5 changes that would have the biggest impact on achieving facial harmony, ranked by impact.
-
-### 5. STRENGTHS
-Highlight the person's best features that already align well with aesthetic ideals.
+(List all features that score 7/10 or higher)
 
 ---
-Be encouraging and constructive. Remember that beauty is subjective and these are guidelines, not absolutes. Focus on enhancing natural features rather than achieving "perfection."
 
-Provide your analysis in a clear, organized format."""
+### CONS - Areas for Potential Enhancement
+
+Rate each area on a scale of 1-10 (lower = more room for improvement) and provide age-appropriate recommendations:
+
+**[Feature Name]: [X/10]**
+- What could be improved
+- Age-appropriate recommendations (considering the person is {age} years old)
+
+(List features that score below 7/10)
+
+---
+
+### FEATURE-BY-FEATURE RATINGS
+
+Provide a quick reference rating for ALL facial focal points:
+
+| Feature | Rating | Notes |
+|---------|--------|-------|
+| Forehead Proportion | X/10 | Brief note |
+| Eye Shape & Symmetry | X/10 | Brief note |
+| Eye Spacing | X/10 | Brief note |
+| Nose Shape | X/10 | Brief note |
+| Nose Proportion | X/10 | Brief note |
+| Lip Shape | X/10 | Brief note |
+| Lip Ratio (upper:lower) | X/10 | Brief note |
+| Cheekbone Definition | X/10 | Brief note |
+| Jaw Definition | X/10 | Brief note |
+| Chin Projection | X/10 | Brief note |
+| Facial Symmetry | X/10 | Brief note |
+| Overall Harmony | X/10 | Brief note |
+
+---
+
+### AGE-APPROPRIATE RECOMMENDATIONS
+
+Given the person is {age} years old, here are realistic improvement options:
+
+**Immediate/Non-Invasive:**
+- Skincare focus areas
+- Makeup/contouring techniques
+- Facial exercises (mewing, etc.)
+
+**Minimally Invasive (if desired):**
+- Specific filler recommendations
+- Botox considerations
+- Other procedures appropriate for this age
+
+**Long-term Considerations:**
+- What to maintain
+- What may change with age
+- Preventative measures
+
+---
+
+### TOP 3 PRIORITY IMPROVEMENTS
+Ranked by potential impact, considering age {age}:
+
+1. **[Area]** - Why and how
+2. **[Area]** - Why and how
+3. **[Area]** - Why and how
+
+---
+
+Be encouraging and constructive. Remember that beauty is subjective and these are guidelines, not absolutes. Focus on enhancing natural features. Consider that at age {age}, certain recommendations may be more or less appropriate."""
 
 
 def allowed_file(filename):
@@ -164,24 +173,40 @@ def chat():
 
 @app.route("/analyze-face", methods=["POST"])
 def analyze_face():
-    """Analyze a face photo for golden ratio proportions and provide recommendations."""
-    if "image" not in request.files:
-        return jsonify({"error": "No image provided"}), 400
+    """Analyze face photos for golden ratio proportions and provide recommendations."""
+    # Check for front photo (required)
+    if "front_image" not in request.files:
+        return jsonify({"error": "Front-facing photo is required"}), 400
 
-    image_file = request.files["image"]
-    if image_file.filename == "":
-        return jsonify({"error": "No image selected"}), 400
+    front_image = request.files["front_image"]
+    if front_image.filename == "":
+        return jsonify({"error": "No front image selected"}), 400
 
-    if not allowed_image(image_file.filename):
+    if not allowed_image(front_image.filename):
         return jsonify({"error": f"Image type not allowed. Allowed: {', '.join(IMAGE_EXTENSIONS)}"}), 400
 
-    try:
-        # Read and encode image
-        image_data = image_file.read()
-        image_base64 = base64.b64encode(image_data).decode("utf-8")
+    # Get age (required)
+    age = request.form.get("age", "")
+    if not age:
+        return jsonify({"error": "Age is required for personalized recommendations"}), 400
 
-        # Determine media type
-        extension = image_file.filename.rsplit('.', 1)[1].lower()
+    try:
+        age = int(age)
+        if age < 1 or age > 120:
+            return jsonify({"error": "Please enter a valid age"}), 400
+    except ValueError:
+        return jsonify({"error": "Age must be a number"}), 400
+
+    # Check for side photo (optional but recommended)
+    side_image = request.files.get("side_image")
+    has_side_photo = side_image and side_image.filename != "" and allowed_image(side_image.filename)
+
+    try:
+        # Process front image
+        front_data = front_image.read()
+        front_base64 = base64.b64encode(front_data).decode("utf-8")
+        front_ext = front_image.filename.rsplit('.', 1)[1].lower()
+
         media_type_map = {
             'jpg': 'image/jpeg',
             'jpeg': 'image/jpeg',
@@ -189,7 +214,54 @@ def analyze_face():
             'gif': 'image/gif',
             'webp': 'image/webp'
         }
-        media_type = media_type_map.get(extension, 'image/jpeg')
+        front_media_type = media_type_map.get(front_ext, 'image/jpeg')
+
+        # Build message content with images
+        content = [
+            {
+                "type": "text",
+                "text": "FRONT-FACING PHOTO:"
+            },
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": front_media_type,
+                    "data": front_base64
+                }
+            }
+        ]
+
+        # Add side photo if provided
+        photo_description = "a front-facing photo"
+        if has_side_photo:
+            side_data = side_image.read()
+            side_base64 = base64.b64encode(side_data).decode("utf-8")
+            side_ext = side_image.filename.rsplit('.', 1)[1].lower()
+            side_media_type = media_type_map.get(side_ext, 'image/jpeg')
+
+            content.extend([
+                {
+                    "type": "text",
+                    "text": "SIDE PROFILE PHOTO:"
+                },
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": side_media_type,
+                        "data": side_base64
+                    }
+                }
+            ])
+            photo_description = "both a front-facing photo and a side profile photo"
+
+        # Add the analysis prompt
+        prompt = FACIAL_ANALYSIS_PROMPT.replace("{photo_description}", photo_description).replace("{age}", str(age))
+        content.append({
+            "type": "text",
+            "text": prompt
+        })
 
         # Call Claude with vision
         body = json.dumps({
@@ -198,20 +270,7 @@ def analyze_face():
             "messages": [
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": image_base64
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": FACIAL_ANALYSIS_PROMPT
-                        }
-                    ]
+                    "content": content
                 }
             ]
         })

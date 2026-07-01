@@ -180,7 +180,7 @@
             border-top: 1px solid #0f3460;
         }
 
-        #file-input, #face-input {
+        #file-input, #front-input, #side-input {
             display: none;
         }
 
@@ -422,6 +422,81 @@
             transform: scale(0.95);
         }
 
+        .age-input-group {
+            background: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .age-input-group label {
+            display: block;
+            color: #e94560;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .age-input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 5px;
+            color: #eee;
+            font-size: 1rem;
+        }
+
+        .age-input-group input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+
+        .age-input-group small {
+            display: block;
+            color: #888;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .photo-section {
+            margin-bottom: 1rem;
+        }
+
+        .photo-section h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .required {
+            background: #e94560;
+            color: white;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: normal;
+        }
+
+        .optional {
+            background: #0f3460;
+            color: #888;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: normal;
+        }
+
+        .photo-section .face-preview {
+            aspect-ratio: 1/1;
+            min-height: 150px;
+        }
+
+        .photo-section .capture-options {
+            margin-bottom: 0.5rem;
+        }
+
         .tips-box {
             background: #1a1a2e;
             padding: 1rem;
@@ -465,6 +540,42 @@
 
         .analysis-content h1:first-child, .analysis-content h2:first-child {
             margin-top: 0;
+        }
+
+        .analysis-content .rating {
+            background: linear-gradient(135deg, #d4af37, #f4e4ba);
+            color: #1a1a2e;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .ratings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .ratings-table th, .ratings-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #0f3460;
+        }
+
+        .ratings-table th {
+            background: #0f3460;
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .ratings-table tr:nth-child(even) {
+            background: #1a1a2e;
+        }
+
+        .ratings-table tr:nth-child(odd) {
+            background: #16213e;
         }
 
         .analysis-placeholder {
@@ -573,20 +684,44 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
     <div id="analyze-tab" class="tab-content">
         <div class="face-analysis-container">
             <div class="face-upload-section">
-                <h2>Capture Your Photo</h2>
+                <h2>Face Analysis Setup</h2>
 
-                <div class="capture-options">
-                    <button id="upload-btn" class="btn">Upload File</button>
-                    <button id="camera-btn" class="btn btn-camera">Use Camera</button>
+                <!-- Age Input -->
+                <div class="age-input-group">
+                    <label for="age-input">Your Age:</label>
+                    <input type="number" id="age-input" min="1" max="120" placeholder="Enter your age">
+                    <small>Age affects recommendations</small>
                 </div>
 
-                <input type="file" id="face-input" accept="image/jpeg,image/png,image/webp,image/gif">
+                <!-- Front Photo -->
+                <div class="photo-section">
+                    <h3>1. Front-Facing Photo <span class="required">*Required</span></h3>
+                    <div class="capture-options">
+                        <button id="front-upload-btn" class="btn">Upload</button>
+                        <button id="front-camera-btn" class="btn btn-camera">Camera</button>
+                    </div>
+                    <input type="file" id="front-input" accept="image/jpeg,image/png,image/webp,image/gif">
+                    <div class="face-preview" id="front-preview" data-type="front">
+                        <div class="face-preview-placeholder">
+                            <div class="icon">👤</div>
+                            <p>Front view</p>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="face-preview" id="face-preview">
-                    <div class="face-preview-placeholder">
-                        <div class="icon">📸</div>
-                        <p>Upload a photo or use your camera</p>
-                        <small>JPG, PNG, WebP supported</small>
+                <!-- Side Photo -->
+                <div class="photo-section">
+                    <h3>2. Side Profile Photo <span class="optional">Optional</span></h3>
+                    <div class="capture-options">
+                        <button id="side-upload-btn" class="btn">Upload</button>
+                        <button id="side-camera-btn" class="btn btn-camera">Camera</button>
+                    </div>
+                    <input type="file" id="side-input" accept="image/jpeg,image/png,image/webp,image/gif">
+                    <div class="face-preview" id="side-preview" data-type="side">
+                        <div class="face-preview-placeholder">
+                            <div class="icon">👤</div>
+                            <p>Side profile</p>
+                        </div>
                     </div>
                 </div>
 
@@ -600,9 +735,9 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 <div class="tips-box">
                     <h3>Tips for Best Results:</h3>
                     <ul>
-                        <li>Face the camera directly</li>
-                        <li>Good, even lighting</li>
-                        <li>Neutral expression</li>
+                        <li>Front: Face camera directly, neutral expression</li>
+                        <li>Side: Turn head 90°, show full profile</li>
+                        <li>Good, even lighting on both</li>
                         <li>Hair pulled back from face</li>
                         <li>No filters or heavy makeup</li>
                     </ul>
@@ -613,7 +748,8 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 <div class="analysis-placeholder">
                     <div class="icon">✨</div>
                     <h2>Golden Ratio Analysis</h2>
-                    <p>Upload a photo or use your camera to receive personalized recommendations<br>based on facial proportions and the golden ratio (φ = 1.618)</p>
+                    <p>Provide your age and at least a front-facing photo<br>to receive personalized recommendations with ratings</p>
+                    <small>Side profile photo enables more accurate jaw/nose analysis</small>
                 </div>
             </div>
         </div>
@@ -658,17 +794,26 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         const refreshFiles = document.getElementById('refresh-files');
 
         // Face analysis elements
-        const faceInput = document.getElementById('face-input');
-        const facePreview = document.getElementById('face-preview');
+        const frontInput = document.getElementById('front-input');
+        const sideInput = document.getElementById('side-input');
+        const frontPreview = document.getElementById('front-preview');
+        const sidePreview = document.getElementById('side-preview');
         const analyzeBtn = document.getElementById('analyze-btn');
         const analysisResult = document.getElementById('analysis-result');
-        const uploadBtn = document.getElementById('upload-btn');
-        const cameraBtn = document.getElementById('camera-btn');
+        const ageInput = document.getElementById('age-input');
         const captureCanvas = document.getElementById('capture-canvas');
 
-        let selectedFaceFile = null;
+        // Button references
+        const frontUploadBtn = document.getElementById('front-upload-btn');
+        const frontCameraBtn = document.getElementById('front-camera-btn');
+        const sideUploadBtn = document.getElementById('side-upload-btn');
+        const sideCameraBtn = document.getElementById('side-camera-btn');
+
+        let frontFile = null;
+        let sideFile = null;
         let cameraStream = null;
         let videoElement = null;
+        let activePhotoType = null; // 'front' or 'side'
 
         function addMessage(content, role, citations = []) {
             const div = document.createElement('div');
@@ -812,7 +957,11 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         }
 
         // Camera Functions
-        async function startCamera() {
+        async function startCamera(photoType) {
+            activePhotoType = photoType;
+            const preview = photoType === 'front' ? frontPreview : sidePreview;
+            const cameraBtn = photoType === 'front' ? frontCameraBtn : sideCameraBtn;
+
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({
                     video: {
@@ -837,16 +986,16 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 `;
 
                 // Clear preview and add video
-                facePreview.innerHTML = '';
-                facePreview.appendChild(videoElement);
-                facePreview.appendChild(controls);
-                facePreview.style.cursor = 'default';
+                preview.innerHTML = '';
+                preview.appendChild(videoElement);
+                preview.appendChild(controls);
+                preview.style.cursor = 'default';
 
                 // Add event listeners
                 document.getElementById('take-photo-btn').addEventListener('click', capturePhoto);
                 document.getElementById('cancel-camera-btn').addEventListener('click', stopCamera);
 
-                cameraBtn.textContent = 'Camera Active';
+                cameraBtn.textContent = 'Active';
                 cameraBtn.disabled = true;
 
             } catch (error) {
@@ -861,23 +1010,30 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 cameraStream = null;
             }
 
-            facePreview.innerHTML = `
+            const preview = activePhotoType === 'front' ? frontPreview : sidePreview;
+            const cameraBtn = activePhotoType === 'front' ? frontCameraBtn : sideCameraBtn;
+            const icon = activePhotoType === 'front' ? '👤' : '👤';
+            const label = activePhotoType === 'front' ? 'Front view' : 'Side profile';
+
+            preview.innerHTML = `
                 <div class="face-preview-placeholder">
-                    <div class="icon">📸</div>
-                    <p>Upload a photo or use your camera</p>
-                    <small>JPG, PNG, WebP supported</small>
+                    <div class="icon">${icon}</div>
+                    <p>${label}</p>
                 </div>
             `;
-            facePreview.style.cursor = 'pointer';
+            preview.style.cursor = 'pointer';
 
-            cameraBtn.textContent = 'Use Camera';
+            cameraBtn.textContent = 'Camera';
             cameraBtn.disabled = false;
-            analyzeBtn.disabled = true;
-            selectedFaceFile = null;
+            activePhotoType = null;
+            checkCanAnalyze();
         }
 
         function capturePhoto() {
             if (!videoElement) return;
+
+            const preview = activePhotoType === 'front' ? frontPreview : sidePreview;
+            const cameraBtn = activePhotoType === 'front' ? frontCameraBtn : sideCameraBtn;
 
             // Set canvas size to video size
             captureCanvas.width = videoElement.videoWidth;
@@ -891,12 +1047,18 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
 
             // Convert to blob
             captureCanvas.toBlob((blob) => {
-                selectedFaceFile = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+                const file = new File([blob], `${activePhotoType}-photo.jpg`, { type: 'image/jpeg' });
+
+                if (activePhotoType === 'front') {
+                    frontFile = file;
+                } else {
+                    sideFile = file;
+                }
 
                 // Show captured image
                 const imgUrl = URL.createObjectURL(blob);
-                facePreview.innerHTML = `<img src="${imgUrl}" alt="Captured photo">`;
-                facePreview.style.cursor = 'pointer';
+                preview.innerHTML = `<img src="${imgUrl}" alt="Captured ${activePhotoType} photo">`;
+                preview.style.cursor = 'pointer';
 
                 // Stop camera stream
                 if (cameraStream) {
@@ -904,66 +1066,110 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                     cameraStream = null;
                 }
 
-                cameraBtn.textContent = 'Use Camera';
+                cameraBtn.textContent = 'Camera';
                 cameraBtn.disabled = false;
-                analyzeBtn.disabled = false;
+                activePhotoType = null;
+                checkCanAnalyze();
 
             }, 'image/jpeg', 0.9);
         }
 
-        // Face Analysis Functions
-        uploadBtn.addEventListener('click', () => {
-            faceInput.click();
-        });
+        function checkCanAnalyze() {
+            const hasAge = ageInput.value && parseInt(ageInput.value) > 0;
+            const hasFront = frontFile !== null;
+            analyzeBtn.disabled = !(hasAge && hasFront);
+        }
 
-        cameraBtn.addEventListener('click', () => {
+        function handleFileSelect(file, photoType) {
+            if (!file) return;
+
+            // Stop camera if running
             if (cameraStream) {
                 stopCamera();
+            }
+
+            const preview = photoType === 'front' ? frontPreview : sidePreview;
+
+            if (photoType === 'front') {
+                frontFile = file;
             } else {
-                startCamera();
+                sideFile = file;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.innerHTML = `<img src="${e.target.result}" alt="${photoType} preview">`;
+                checkCanAnalyze();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Face Analysis Event Listeners
+        frontUploadBtn.addEventListener('click', () => frontInput.click());
+        sideUploadBtn.addEventListener('click', () => sideInput.click());
+
+        frontCameraBtn.addEventListener('click', () => {
+            if (cameraStream && activePhotoType === 'front') {
+                stopCamera();
+            } else {
+                if (cameraStream) stopCamera();
+                startCamera('front');
             }
         });
 
-        facePreview.addEventListener('click', () => {
-            if (!cameraStream && !facePreview.querySelector('img')) {
-                faceInput.click();
+        sideCameraBtn.addEventListener('click', () => {
+            if (cameraStream && activePhotoType === 'side') {
+                stopCamera();
+            } else {
+                if (cameraStream) stopCamera();
+                startCamera('side');
             }
         });
 
-        faceInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                // Stop camera if running
-                if (cameraStream) {
-                    stopCamera();
-                }
-
-                selectedFaceFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    facePreview.innerHTML = `<img src="${e.target.result}" alt="Face preview">`;
-                    analyzeBtn.disabled = false;
-                };
-                reader.readAsDataURL(file);
+        frontPreview.addEventListener('click', () => {
+            if (!cameraStream && !frontPreview.querySelector('img')) {
+                frontInput.click();
             }
         });
+
+        sidePreview.addEventListener('click', () => {
+            if (!cameraStream && !sidePreview.querySelector('img')) {
+                sideInput.click();
+            }
+        });
+
+        frontInput.addEventListener('change', (e) => {
+            handleFileSelect(e.target.files[0], 'front');
+        });
+
+        sideInput.addEventListener('change', (e) => {
+            handleFileSelect(e.target.files[0], 'side');
+        });
+
+        ageInput.addEventListener('input', checkCanAnalyze);
 
         async function analyzeFace() {
-            if (!selectedFaceFile) return;
+            if (!frontFile || !ageInput.value) return;
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
 
+            const photoCount = sideFile ? 'both photos' : 'your photo';
             analysisResult.innerHTML = `
                 <div class="analysis-placeholder">
                     <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
-                    <h2>Analyzing Your Face...</h2>
-                    <p>This may take 15-30 seconds</p>
+                    <h2>Analyzing ${photoCount}...</h2>
+                    <p>This may take 20-40 seconds</p>
+                    <small>Generating detailed ratings and recommendations</small>
                 </div>
             `;
 
             const formData = new FormData();
-            formData.append('image', selectedFaceFile);
+            formData.append('front_image', frontFile);
+            formData.append('age', ageInput.value);
+            if (sideFile) {
+                formData.append('side_image', sideFile);
+            }
 
             try {
                 const response = await fetch('/analyze-face', {
@@ -1001,8 +1207,22 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         }
 
         function formatAnalysis(text) {
+            // Convert markdown tables to HTML tables
+            let html = text;
+
+            // Process tables
+            const tableRegex = /\|(.+)\|\n\|[-|\s]+\|\n((?:\|.+\|\n?)+)/g;
+            html = html.replace(tableRegex, (match, header, body) => {
+                const headerCells = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+                const rows = body.trim().split('\n').map(row => {
+                    const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+                    return `<tr>${cells}</tr>`;
+                }).join('');
+                return `<table class="ratings-table"><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table>`;
+            });
+
             // Convert markdown-like formatting to HTML
-            let html = text
+            html = html
                 .replace(/### (.*)/g, '<h3>$1</h3>')
                 .replace(/## (.*)/g, '<h2>$1</h2>')
                 .replace(/# (.*)/g, '<h1>$1</h1>')
@@ -1010,6 +1230,10 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
                 .replace(/---/g, '<hr>')
                 .replace(/\n/g, '<br>');
+
+            // Highlight ratings (X/10)
+            html = html.replace(/(\d+\/10)/g, '<span class="rating">$1</span>');
+
             return html;
         }
 
