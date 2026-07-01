@@ -227,8 +227,9 @@ def chat():
 @app.route("/analyze-face", methods=["POST"])
 def analyze_face():
     """Analyze face photos for golden ratio proportions and provide recommendations."""
-    # Check for front photo (required)
-    if "front_image" not in request.files:
+    try:
+        # Check for front photo (required)
+        if "front_image" not in request.files:
         return jsonify({"error": "Front-facing photo is required"}), 400
 
     front_image = request.files["front_image"]
@@ -355,7 +356,10 @@ def analyze_face():
         })
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error in analyze_face: {error_details}")
+        return jsonify({"error": f"Analysis failed: {str(e)}"}), 500
 
 
 @app.route("/generate-optimized", methods=["POST"])
