@@ -409,84 +409,113 @@ IMPORTANT GUIDELINES:
 - Keep the same pose, expression, and background
 - Make it look like a realistic "after" photo, not AI-generated"""
 
-        # Use Titan Image Generator for image-to-image transformation
+        # Use Titan Image Generator V2 for image-to-image transformation
         titan_body = json.dumps({
             "taskType": "IMAGE_VARIATION",
             "imageVariationParams": {
                 "images": [image_base64],
                 "text": modification_prompt,
-                "similarityStrength": 0.7  # Keep it similar but allow changes
+                "similarityStrength": 0.7
             },
             "imageGenerationConfig": {
                 "numberOfImages": 1,
-                "width": 512,
-                "height": 512,
+                "width": 1024,
+                "height": 1024,
                 "cfgScale": 8.0
             }
         })
 
-        response = bedrock_runtime.invoke_model(
-            modelId="amazon.titan-image-generator-v1",
-            contentType="application/json",
-            accept="application/json",
-            body=titan_body
-        )
+        try:
+            response = bedrock_runtime.invoke_model(
+                modelId="amazon.titan-image-generator-v2:0",
+                contentType="application/json",
+                accept="application/json",
+                body=titan_body
+            )
 
-        response_body = json.loads(response["body"].read())
+            response_body = json.loads(response["body"].read())
 
-        if "images" in response_body and len(response_body["images"]) > 0:
-            generated_image = response_body["images"][0]
-            return jsonify({
-                "status": "success",
-                "image": generated_image
+            if "images" in response_body and len(response_body["images"]) > 0:
+                generated_image = response_body["images"][0]
+                return jsonify({
+                    "status": "success",
+                    "image": generated_image
+                })
+        except Exception as titan_error:
+            print(f"Titan V2 failed: {titan_error}", flush=True)
+
+        # Fallback to Stable Diffusion 3
+        try:
+            sd3_body = json.dumps({
+                "prompt": f"Professional portrait photo showing subtle facial improvements: {', '.join(suggestions[:5])}. Photorealistic, natural lighting, high quality, same person",
+                "negative_prompt": "cartoon, anime, drawing, painting, unrealistic, distorted, ugly, different person",
+                "image": image_base64,
+                "strength": 0.4,
+                "mode": "image-to-image",
+                "output_format": "png"
             })
-        else:
-            return jsonify({"error": "No image generated"}), 500
+
+            response = bedrock_runtime.invoke_model(
+                modelId="stability.sd3-large-v1:0",
+                contentType="application/json",
+                accept="application/json",
+                body=sd3_body
+            )
+
+            response_body = json.loads(response["body"].read())
+
+            if "images" in response_body and len(response_body["images"]) > 0:
+                generated_image = response_body["images"][0]
+                return jsonify({
+                    "status": "success",
+                    "image": generated_image
+                })
+        except Exception as sd3_error:
+            print(f"SD3 failed: {sd3_error}", flush=True)
+
+        # Final fallback to Stable Diffusion XL
+        try:
+            sdxl_body = json.dumps({
+                "text_prompts": [
+                    {
+                        "text": f"Professional portrait photo, same person with subtle facial improvements: {', '.join(suggestions[:5])}. Photorealistic, natural lighting, high quality",
+                        "weight": 1.0
+                    },
+                    {
+                        "text": "cartoon, anime, drawing, painting, unrealistic, distorted, ugly, different person",
+                        "weight": -1.0
+                    }
+                ],
+                "init_image": image_base64,
+                "init_image_mode": "IMAGE_STRENGTH",
+                "image_strength": 0.35,
+                "cfg_scale": 7,
+                "samples": 1,
+                "steps": 30
+            })
+
+            response = bedrock_runtime.invoke_model(
+                modelId="stability.stable-diffusion-xl-v1",
+                contentType="application/json",
+                accept="application/json",
+                body=sdxl_body
+            )
+
+            response_body = json.loads(response["body"].read())
+
+            if "artifacts" in response_body and len(response_body["artifacts"]) > 0:
+                generated_image = response_body["artifacts"][0]["base64"]
+                return jsonify({
+                    "status": "success",
+                    "image": generated_image
+                })
+        except Exception as sdxl_error:
+            print(f"SDXL failed: {sdxl_error}", flush=True)
+
+        return jsonify({"error": "Image generation not available. Please enable Titan Image Generator V2, Stable Diffusion 3, or Stable Diffusion XL in AWS Bedrock Model Access."}), 500
 
     except Exception as e:
-        error_msg = str(e)
-        # If Titan fails, try with Stable Diffusion
-        if "ValidationException" in error_msg or "AccessDeniedException" in error_msg:
-            try:
-                # Fallback to Stable Diffusion SDXL
-                sd_body = json.dumps({
-                    "text_prompts": [
-                        {
-                            "text": f"Professional portrait photo, same person with subtle facial improvements: {', '.join(suggestions[:5])}. Photorealistic, natural lighting, high quality",
-                            "weight": 1.0
-                        },
-                        {
-                            "text": "cartoon, anime, drawing, painting, unrealistic, distorted, ugly",
-                            "weight": -1.0
-                        }
-                    ],
-                    "init_image": image_base64,
-                    "init_image_mode": "IMAGE_STRENGTH",
-                    "image_strength": 0.35,
-                    "cfg_scale": 7,
-                    "samples": 1,
-                    "steps": 30
-                })
-
-                response = bedrock_runtime.invoke_model(
-                    modelId="stability.stable-diffusion-xl-v1",
-                    contentType="application/json",
-                    accept="application/json",
-                    body=sd_body
-                )
-
-                response_body = json.loads(response["body"].read())
-
-                if "artifacts" in response_body and len(response_body["artifacts"]) > 0:
-                    generated_image = response_body["artifacts"][0]["base64"]
-                    return jsonify({
-                        "status": "success",
-                        "image": generated_image
-                    })
-            except Exception as sd_error:
-                return jsonify({"error": f"Image generation not available. Enable Titan Image Generator or Stable Diffusion in AWS Bedrock console. Error: {str(sd_error)}"}), 500
-
-        return jsonify({"error": f"Image generation failed: {error_msg}"}), 500
+        return jsonify({"error": f"Image generation failed: {str(e)}"}), 500
 
 
 @app.route("/upload", methods=["POST"])
