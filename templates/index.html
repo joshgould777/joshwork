@@ -829,8 +829,8 @@
 
         .skeleton-scanner {
             position: relative;
-            width: 200px;
-            height: 350px;
+            width: 180px;
+            height: 300px;
             margin-bottom: 1.5rem;
         }
 
@@ -843,25 +843,35 @@
         .skeleton-figure svg {
             width: 100%;
             height: 100%;
-            stroke: #0f3460;
-            stroke-width: 2;
-            fill: none;
-            filter: drop-shadow(0 0 10px rgba(233, 69, 96, 0.3));
+            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.4));
         }
 
         .skeleton-figure svg .bone {
-            stroke: #e94560;
-            opacity: 0.6;
-            animation: bonePulse 2s ease-in-out infinite;
+            fill: none;
+            stroke: #00ff88;
+            stroke-width: 1.5;
+            opacity: 0.8;
+            animation: bonePulse 1.5s ease-in-out infinite;
         }
 
-        .skeleton-figure svg .bone:nth-child(odd) {
-            animation-delay: 0.5s;
+        .skeleton-figure svg .bone-fill {
+            fill: rgba(0, 255, 136, 0.1);
+            stroke: #00ff88;
+            stroke-width: 1;
         }
+
+        .skeleton-figure svg .joint {
+            fill: #00ff88;
+            opacity: 0.9;
+        }
+
+        .skeleton-figure svg .bone:nth-child(3n) { animation-delay: 0.2s; }
+        .skeleton-figure svg .bone:nth-child(3n+1) { animation-delay: 0.4s; }
+        .skeleton-figure svg .bone:nth-child(3n+2) { animation-delay: 0.6s; }
 
         @keyframes bonePulse {
-            0%, 100% { opacity: 0.4; stroke: #e94560; }
-            50% { opacity: 1; stroke: #ff6b6b; }
+            0%, 100% { opacity: 0.5; stroke: #00ff88; }
+            50% { opacity: 1; stroke: #00ffaa; }
         }
 
         .scan-line {
@@ -1732,56 +1742,81 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                     <div class="skeleton-scanner">
                         <div class="scan-grid"></div>
                         <div class="skeleton-figure">
-                            <svg viewBox="0 0 100 175">
-                                <!-- Skull -->
-                                <ellipse class="bone" cx="50" cy="15" rx="18" ry="15"/>
-                                <circle class="bone" cx="43" cy="12" r="3"/>
-                                <circle class="bone" cx="57" cy="12" r="3"/>
-                                <path class="bone" d="M44 22 L50 26 L56 22"/>
-                                <path class="bone" d="M42 28 Q50 32 58 28"/>
+                            <svg viewBox="0 0 120 200">
+                                <!-- Skull - more anatomical -->
+                                <path class="bone bone-fill" d="M60 8 C35 8 28 25 28 38 C28 52 35 62 45 65 L45 72 L75 72 L75 65 C85 62 92 52 92 38 C92 25 85 8 60 8 Z"/>
+                                <ellipse class="bone" cx="48" cy="32" rx="8" ry="5"/>
+                                <ellipse class="bone" cx="72" cy="32" rx="8" ry="5"/>
+                                <path class="bone" d="M55 45 L60 52 L65 45"/>
+                                <path class="bone" d="M48 58 Q60 65 72 58"/>
+                                <line class="bone" x1="45" y1="65" x2="45" y2="72"/>
+                                <line class="bone" x1="75" y1="65" x2="75" y2="72"/>
 
-                                <!-- Spine -->
-                                <line class="bone" x1="50" y1="30" x2="50" y2="85"/>
-                                <ellipse class="bone" cx="50" cy="35" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="42" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="49" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="56" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="63" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="70" rx="3" ry="2"/>
-                                <ellipse class="bone" cx="50" cy="77" rx="3" ry="2"/>
+                                <!-- Cervical Spine -->
+                                <rect class="bone" x="56" y="72" width="8" height="5" rx="1"/>
+                                <rect class="bone" x="56" y="78" width="8" height="5" rx="1"/>
+                                <rect class="bone" x="56" y="84" width="8" height="5" rx="1"/>
 
-                                <!-- Ribcage -->
-                                <path class="bone" d="M50 35 Q30 40 28 50 Q30 55 50 55"/>
-                                <path class="bone" d="M50 35 Q70 40 72 50 Q70 55 50 55"/>
-                                <path class="bone" d="M50 42 Q32 47 30 55 Q32 60 50 60"/>
-                                <path class="bone" d="M50 42 Q68 47 70 55 Q68 60 50 60"/>
-                                <path class="bone" d="M50 49 Q35 52 33 58 Q35 63 50 65"/>
-                                <path class="bone" d="M50 49 Q65 52 67 58 Q65 63 50 65"/>
+                                <!-- Clavicles -->
+                                <path class="bone" d="M56 90 Q40 88 22 95"/>
+                                <path class="bone" d="M64 90 Q80 88 98 95"/>
 
-                                <!-- Shoulders & Arms -->
-                                <line class="bone" x1="28" y1="35" x2="50" y2="35"/>
-                                <line class="bone" x1="72" y1="35" x2="50" y2="35"/>
-                                <line class="bone" x1="28" y1="35" x2="20" y2="60"/>
-                                <line class="bone" x1="72" y1="35" x2="80" y2="60"/>
-                                <line class="bone" x1="20" y1="60" x2="15" y2="85"/>
-                                <line class="bone" x1="80" y1="60" x2="85" y2="85"/>
+                                <!-- Scapulae (shoulder blades) -->
+                                <path class="bone bone-fill" d="M18 95 L12 130 L30 125 L28 100 Z"/>
+                                <path class="bone bone-fill" d="M102 95 L108 130 L90 125 L92 100 Z"/>
 
-                                <!-- Hands -->
-                                <circle class="bone" cx="15" cy="88" r="4"/>
-                                <circle class="bone" cx="85" cy="88" r="4"/>
+                                <!-- Thoracic Spine & Ribs -->
+                                <rect class="bone" x="56" y="90" width="8" height="4" rx="1"/>
+                                <path class="bone" d="M56 92 Q35 95 30 105 Q32 115 56 118"/>
+                                <path class="bone" d="M64 92 Q85 95 90 105 Q88 115 64 118"/>
+
+                                <rect class="bone" x="56" y="95" width="8" height="4" rx="1"/>
+                                <path class="bone" d="M56 97 Q38 100 33 110 Q35 120 56 123"/>
+                                <path class="bone" d="M64 97 Q82 100 87 110 Q85 120 64 123"/>
+
+                                <rect class="bone" x="56" y="100" width="8" height="4" rx="1"/>
+                                <path class="bone" d="M56 102 Q40 105 35 115 Q37 125 56 128"/>
+                                <path class="bone" d="M64 102 Q80 105 85 115 Q83 125 64 128"/>
+
+                                <rect class="bone" x="56" y="105" width="8" height="4" rx="1"/>
+                                <rect class="bone" x="56" y="110" width="8" height="4" rx="1"/>
+                                <rect class="bone" x="56" y="115" width="8" height="4" rx="1"/>
+
+                                <!-- Sternum -->
+                                <rect class="bone" x="57" y="92" width="6" height="28" rx="2"/>
+
+                                <!-- Lumbar Spine -->
+                                <rect class="bone" x="55" y="122" width="10" height="5" rx="1"/>
+                                <rect class="bone" x="55" y="128" width="10" height="5" rx="1"/>
+                                <rect class="bone" x="55" y="134" width="10" height="5" rx="1"/>
 
                                 <!-- Pelvis -->
-                                <path class="bone" d="M35 85 Q50 80 65 85 Q65 95 50 100 Q35 95 35 85"/>
+                                <path class="bone bone-fill" d="M35 140 Q30 145 28 160 L45 165 L55 150 L60 148 L65 150 L75 165 L92 160 Q90 145 85 140 Q60 135 35 140 Z"/>
+                                <ellipse class="bone" cx="60" cy="155" rx="8" ry="6"/>
 
-                                <!-- Legs -->
-                                <line class="bone" x1="40" y1="95" x2="35" y2="135"/>
-                                <line class="bone" x1="60" y1="95" x2="65" y2="135"/>
-                                <line class="bone" x1="35" y1="135" x2="33" y2="165"/>
-                                <line class="bone" x1="65" y1="135" x2="67" y2="165"/>
+                                <!-- Humerus (upper arms) -->
+                                <line class="bone" x1="22" y1="95" x2="18" y2="130" stroke-width="4" stroke-linecap="round"/>
+                                <line class="bone" x1="98" y1="95" x2="102" y2="130" stroke-width="4" stroke-linecap="round"/>
+                                <circle class="joint" cx="22" cy="95" r="4"/>
+                                <circle class="joint" cx="98" cy="95" r="4"/>
 
-                                <!-- Feet -->
-                                <ellipse class="bone" cx="30" cy="168" rx="6" ry="3"/>
-                                <ellipse class="bone" cx="70" cy="168" rx="6" ry="3"/>
+                                <!-- Radius & Ulna (forearms) -->
+                                <line class="bone" x1="18" y1="130" x2="12" y2="165" stroke-width="2"/>
+                                <line class="bone" x1="18" y1="130" x2="16" y2="165" stroke-width="2"/>
+                                <line class="bone" x1="102" y1="130" x2="108" y2="165" stroke-width="2"/>
+                                <line class="bone" x1="102" y1="130" x2="104" y2="165" stroke-width="2"/>
+                                <circle class="joint" cx="18" cy="130" r="3"/>
+                                <circle class="joint" cx="102" cy="130" r="3"/>
+
+                                <!-- Hands -->
+                                <path class="bone" d="M10 165 L8 175 M12 165 L11 177 M14 165 L14 178 M16 165 L17 177 M14 165 L20 172"/>
+                                <path class="bone" d="M110 165 L112 175 M108 165 L109 177 M106 165 L106 178 M104 165 L103 177 M106 165 L100 172"/>
+
+                                <!-- Femur (thigh bones) -->
+                                <line class="bone" x1="45" y1="165" x2="42" y2="220" stroke-width="5" stroke-linecap="round"/>
+                                <line class="bone" x1="75" y1="165" x2="78" y2="220" stroke-width="5" stroke-linecap="round"/>
+                                <circle class="joint" cx="45" cy="165" r="5"/>
+                                <circle class="joint" cx="75" cy="165" r="5"/>
                             </svg>
                         </div>
                         <div class="scan-line"></div>
@@ -1810,11 +1845,17 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
             }
 
             try {
+                // Add timeout to fetch request (90 seconds)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 90000);
+
                 const response = await fetch('/analyze-face', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 stopScanningAnimation();
@@ -1857,11 +1898,20 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 }
             } catch (error) {
                 stopScanningAnimation();
+                let errorTitle = 'Connection Error';
+                let errorMsg = 'Failed to connect to server. Please try again.';
+
+                if (error.name === 'AbortError') {
+                    errorTitle = 'Analysis Timeout';
+                    errorMsg = 'The analysis took too long (>90 seconds). Please try again with a smaller image or check your internet connection.';
+                }
+
                 analysisResult.innerHTML = `
                     <div class="analysis-placeholder">
                         <div class="icon" style="color: #e94560;">⚠️</div>
-                        <h2>Connection Error</h2>
-                        <p>Failed to connect to server. Please try again.</p>
+                        <h2>${errorTitle}</h2>
+                        <p>${errorMsg}</p>
+                        <small style="color: #666; margin-top: 1rem; display: block;">${error.message || ''}</small>
                     </div>
                 `;
             }
