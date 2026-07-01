@@ -422,23 +422,30 @@
             transform: scale(0.95);
         }
 
-        .age-input-group {
-            background: #1a1a2e;
-            padding: 1rem;
-            border-radius: 8px;
+        .input-row {
+            display: flex;
+            gap: 0.75rem;
             margin-bottom: 1rem;
         }
 
-        .age-input-group label {
+        .input-group {
+            flex: 1;
+            background: #1a1a2e;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .input-group label {
             display: block;
             color: #e94560;
             font-weight: bold;
             margin-bottom: 0.5rem;
+            font-size: 0.85rem;
         }
 
-        .age-input-group input {
+        .input-group input {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.6rem;
             background: #16213e;
             border: 1px solid #0f3460;
             border-radius: 5px;
@@ -446,16 +453,25 @@
             font-size: 1rem;
         }
 
-        .age-input-group input:focus {
+        .input-group input:focus {
             outline: none;
             border-color: #e94560;
         }
 
-        .age-input-group small {
-            display: block;
-            color: #888;
-            margin-top: 0.5rem;
+        .tab.locked {
+            color: #555;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .tab.locked::after {
+            content: "🔒";
+            margin-left: 0.5rem;
             font-size: 0.8rem;
+        }
+
+        .tab.locked:hover {
+            background: transparent;
         }
 
         .photo-section {
@@ -578,6 +594,203 @@
             background: #16213e;
         }
 
+        /* Optimized Tab Styles */
+        .optimized-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .suggestions-sidebar {
+            width: 350px;
+            background: #16213e;
+            border-right: 1px solid #0f3460;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .suggestions-sidebar h2 {
+            color: #e94560;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-info {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-controls .btn {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        #suggestions-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-item {
+            background: #1a1a2e;
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            border-color: #e94560;
+        }
+
+        .suggestion-item.selected {
+            border-color: #d4af37;
+            background: #2a2a4e;
+        }
+
+        .suggestion-item .suggestion-title {
+            font-weight: bold;
+            color: #eee;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .suggestion-item .suggestion-title .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #0f3460;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .suggestion-item.selected .checkbox {
+            background: #d4af37;
+            border-color: #d4af37;
+        }
+
+        .suggestion-item.selected .checkbox::after {
+            content: "✓";
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .suggestion-item .suggestion-desc {
+            color: #888;
+            font-size: 0.8rem;
+            margin-left: 1.6rem;
+        }
+
+        .suggestion-item .suggestion-type {
+            display: inline-block;
+            background: #0f3460;
+            color: #888;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            margin-left: 1.6rem;
+            margin-top: 0.25rem;
+        }
+
+        .suggestion-item .suggestion-type.surgical {
+            background: #5c1a1a;
+            color: #ff6b6b;
+        }
+
+        .suggestion-item .suggestion-type.non-invasive {
+            background: #1e5128;
+            color: #4ade80;
+        }
+
+        .suggestion-item .suggestion-type.minimally-invasive {
+            background: #4a3f00;
+            color: #fbbf24;
+        }
+
+        .preview-area {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-comparison {
+            display: flex;
+            gap: 1.5rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-panel h3 {
+            color: #e94560;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .preview-image {
+            flex: 1;
+            background: #16213e;
+            border: 2px solid #0f3460;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-placeholder {
+            color: #555;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .optimization-status {
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 2rem;
+        }
+
+        .optimization-status.loading {
+            color: #d4af37;
+        }
+
+        .optimization-status.error {
+            color: #e94560;
+        }
+
+        .optimization-status.success {
+            color: #4ade80;
+        }
+
         .analysis-placeholder {
             text-align: center;
             color: #666;
@@ -637,6 +850,7 @@
     <div class="tabs">
         <div class="tab active" data-tab="chat">Knowledge Base Chat</div>
         <div class="tab" data-tab="analyze">Face Analysis</div>
+        <div class="tab locked" data-tab="optimized" id="optimized-tab-btn">Optimized View</div>
     </div>
 
     <!-- Chat Tab -->
@@ -686,11 +900,16 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
             <div class="face-upload-section">
                 <h2>Face Analysis Setup</h2>
 
-                <!-- Age Input -->
-                <div class="age-input-group">
-                    <label for="age-input">Your Age:</label>
-                    <input type="number" id="age-input" min="1" max="120" placeholder="Enter your age">
-                    <small>Age affects recommendations</small>
+                <!-- Age & Weight Inputs -->
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="age-input">Age:</label>
+                        <input type="number" id="age-input" min="1" max="120" placeholder="Age">
+                    </div>
+                    <div class="input-group">
+                        <label for="weight-input">Weight (lbs):</label>
+                        <input type="number" id="weight-input" min="50" max="500" placeholder="Weight">
+                    </div>
                 </div>
 
                 <!-- Front Photo -->
@@ -748,9 +967,50 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 <div class="analysis-placeholder">
                     <div class="icon">✨</div>
                     <h2>Golden Ratio Analysis</h2>
-                    <p>Provide your age and at least a front-facing photo<br>to receive personalized recommendations with ratings</p>
+                    <p>Provide your age, weight, and at least a front-facing photo<br>to receive personalized recommendations with ratings</p>
                     <small>Side profile photo enables more accurate jaw/nose analysis</small>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optimized View Tab -->
+    <div id="optimized-tab" class="tab-content">
+        <div class="optimized-container">
+            <div class="suggestions-sidebar">
+                <h2>Suggested Improvements</h2>
+                <p class="sidebar-info">Select improvements to visualize</p>
+
+                <div class="suggestion-controls">
+                    <button id="select-all-btn" class="btn">Select All</button>
+                    <button id="clear-all-btn" class="btn">Clear All</button>
+                </div>
+
+                <div id="suggestions-list">
+                    <!-- Suggestions will be populated here -->
+                </div>
+
+                <button id="generate-preview-btn" class="btn btn-gold" disabled>
+                    Generate Preview
+                </button>
+            </div>
+
+            <div class="preview-area">
+                <div class="preview-comparison">
+                    <div class="preview-panel">
+                        <h3>Current</h3>
+                        <div id="original-photo" class="preview-image">
+                            <div class="preview-placeholder">Original photo will appear here</div>
+                        </div>
+                    </div>
+                    <div class="preview-panel">
+                        <h3>Optimized</h3>
+                        <div id="optimized-photo" class="preview-image">
+                            <div class="preview-placeholder">Select improvements and click Generate</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="optimization-status" class="optimization-status"></div>
             </div>
         </div>
     </div>
@@ -762,6 +1022,11 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
+                // Don't allow clicking locked tabs
+                if (tab.classList.contains('locked')) {
+                    return;
+                }
+
                 const tabId = tab.dataset.tab;
 
                 tabs.forEach(t => t.classList.remove('active'));
@@ -780,6 +1045,10 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                 }
             });
         });
+
+        function unlockOptimizedTab() {
+            optimizedTabBtn.classList.remove('locked');
+        }
 
         // Chat functionality
         const chatContainer = document.getElementById('chat-container');
@@ -801,6 +1070,7 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         const analyzeBtn = document.getElementById('analyze-btn');
         const analysisResult = document.getElementById('analysis-result');
         const ageInput = document.getElementById('age-input');
+        const weightInput = document.getElementById('weight-input');
         const captureCanvas = document.getElementById('capture-canvas');
 
         // Button references
@@ -809,11 +1079,23 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         const sideUploadBtn = document.getElementById('side-upload-btn');
         const sideCameraBtn = document.getElementById('side-camera-btn');
 
+        // Optimized tab elements
+        const optimizedTabBtn = document.getElementById('optimized-tab-btn');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const selectAllBtn = document.getElementById('select-all-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const generatePreviewBtn = document.getElementById('generate-preview-btn');
+        const originalPhotoDiv = document.getElementById('original-photo');
+        const optimizedPhotoDiv = document.getElementById('optimized-photo');
+        const optimizationStatus = document.getElementById('optimization-status');
+
         let frontFile = null;
         let sideFile = null;
         let cameraStream = null;
         let videoElement = null;
         let activePhotoType = null; // 'front' or 'side'
+        let analysisData = null; // Store analysis results
+        let suggestions = []; // Parsed suggestions
 
         function addMessage(content, role, citations = []) {
             const div = document.createElement('div');
@@ -1076,8 +1358,9 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
 
         function checkCanAnalyze() {
             const hasAge = ageInput.value && parseInt(ageInput.value) > 0;
+            const hasWeight = weightInput.value && parseInt(weightInput.value) > 0;
             const hasFront = frontFile !== null;
-            analyzeBtn.disabled = !(hasAge && hasFront);
+            analyzeBtn.disabled = !(hasAge && hasWeight && hasFront);
         }
 
         function handleFileSelect(file, photoType) {
@@ -1147,9 +1430,10 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         });
 
         ageInput.addEventListener('input', checkCanAnalyze);
+        weightInput.addEventListener('input', checkCanAnalyze);
 
         async function analyzeFace() {
-            if (!frontFile || !ageInput.value) return;
+            if (!frontFile || !ageInput.value || !weightInput.value) return;
 
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
@@ -1167,6 +1451,7 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
             const formData = new FormData();
             formData.append('front_image', frontFile);
             formData.append('age', ageInput.value);
+            formData.append('weight', weightInput.value);
             if (sideFile) {
                 formData.append('side_image', sideFile);
             }
@@ -1188,9 +1473,26 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                         </div>
                     `;
                 } else {
+                    // Store analysis data
+                    analysisData = data;
+
                     // Format the analysis with markdown-like styling
                     const formattedAnalysis = formatAnalysis(data.analysis);
                     analysisResult.innerHTML = `<div class="analysis-content">${formattedAnalysis}</div>`;
+
+                    // Parse suggestions and populate the Optimized tab
+                    parseSuggestions(data.analysis);
+                    populateSuggestionsList();
+
+                    // Set original photo in Optimized tab
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        originalPhotoDiv.innerHTML = `<img src="${e.target.result}" alt="Original photo">`;
+                    };
+                    reader.readAsDataURL(frontFile);
+
+                    // Unlock the Optimized tab
+                    unlockOptimizedTab();
                 }
             } catch (error) {
                 analysisResult.innerHTML = `
@@ -1267,6 +1569,234 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         });
 
         messageInput.focus();
+
+        // Suggestion parsing and optimization functions
+        function parseSuggestions(analysisText) {
+            suggestions = [];
+
+            // Parse TOP 3 PRIORITY FIXES section
+            const priorityMatch = analysisText.match(/TOP 3 PRIORITY FIXES[\s\S]*?(?=###|---|\n\n\n|$)/i);
+            if (priorityMatch) {
+                const priorityText = priorityMatch[0];
+                const fixes = priorityText.match(/\d+\.\s*\*\*([^*]+)\*\*\s*[-–]\s*([^\n]+)/g);
+                if (fixes) {
+                    fixes.forEach((fix, index) => {
+                        const match = fix.match(/\d+\.\s*\*\*([^*]+)\*\*\s*[-–]\s*(.+)/);
+                        if (match) {
+                            suggestions.push({
+                                id: `priority-${index}`,
+                                title: match[1].trim(),
+                                description: match[2].trim(),
+                                type: 'priority',
+                                selected: false
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Parse CONS section for additional suggestions
+            const consMatch = analysisText.match(/CONS[\s\S]*?(?=###|FEATURE-BY-FEATURE)/i);
+            if (consMatch) {
+                const consText = consMatch[0];
+                const conItems = consText.match(/\*\*([^:*]+):\s*\d+\/10\*\*[\s\S]*?(?=\*\*[^*]+:\s*\d+\/10\*\*|---|###|$)/g);
+                if (conItems) {
+                    conItems.forEach((item, index) => {
+                        const titleMatch = item.match(/\*\*([^:*]+):/);
+                        if (titleMatch && !suggestions.find(s => s.title.toLowerCase().includes(titleMatch[1].toLowerCase().trim()))) {
+                            // Extract fix recommendation
+                            const fixMatch = item.match(/fix[^\n]*|improve[^\n]*|recommend[^\n]*/i);
+                            suggestions.push({
+                                id: `con-${index}`,
+                                title: titleMatch[1].trim(),
+                                description: fixMatch ? fixMatch[0].trim() : 'See analysis for details',
+                                type: detectSuggestionType(item),
+                                selected: false
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Parse REALISTIC FIXES section
+            const fixesMatch = analysisText.match(/REALISTIC FIXES[\s\S]*?(?=###|TOP 3|$)/i);
+            if (fixesMatch) {
+                const fixesText = fixesMatch[0];
+
+                // Non-invasive
+                const nonInvasiveMatch = fixesText.match(/Non-invasive[^\n]*[\s\S]*?(?=Minimally|Surgical|What Cannot|---|\n\n)/i);
+                if (nonInvasiveMatch) {
+                    const items = nonInvasiveMatch[0].match(/-\s*([^\n]+)/g);
+                    if (items) {
+                        items.forEach((item, index) => {
+                            const text = item.replace(/^-\s*/, '').trim();
+                            if (text && !suggestions.find(s => s.description.toLowerCase().includes(text.toLowerCase().substring(0, 20)))) {
+                                suggestions.push({
+                                    id: `noninv-${index}`,
+                                    title: text.split(/[-–(]/)[0].trim(),
+                                    description: text,
+                                    type: 'non-invasive',
+                                    selected: false
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // Minimally invasive
+                const minInvasiveMatch = fixesText.match(/Minimally invasive[^\n]*[\s\S]*?(?=Surgical|What Cannot|---|\n\n)/i);
+                if (minInvasiveMatch) {
+                    const items = minInvasiveMatch[0].match(/-\s*([^\n]+)/g);
+                    if (items) {
+                        items.forEach((item, index) => {
+                            const text = item.replace(/^-\s*/, '').trim();
+                            if (text && !suggestions.find(s => s.description.toLowerCase().includes(text.toLowerCase().substring(0, 20)))) {
+                                suggestions.push({
+                                    id: `mininv-${index}`,
+                                    title: text.split(/[-–(]/)[0].trim(),
+                                    description: text,
+                                    type: 'minimally-invasive',
+                                    selected: false
+                                });
+                            }
+                        });
+                    }
+                }
+
+                // Surgical
+                const surgicalMatch = fixesText.match(/Surgical[^\n]*[\s\S]*?(?=What Cannot|---|\n\n|$)/i);
+                if (surgicalMatch) {
+                    const items = surgicalMatch[0].match(/-\s*([^\n]+)/g);
+                    if (items) {
+                        items.forEach((item, index) => {
+                            const text = item.replace(/^-\s*/, '').trim();
+                            if (text && !suggestions.find(s => s.description.toLowerCase().includes(text.toLowerCase().substring(0, 20)))) {
+                                suggestions.push({
+                                    id: `surg-${index}`,
+                                    title: text.split(/[-–(]/)[0].trim(),
+                                    description: text,
+                                    type: 'surgical',
+                                    selected: false
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Limit and dedupe
+            suggestions = suggestions.filter(s => s.title.length > 2 && s.title.length < 50);
+            suggestions = suggestions.slice(0, 15);
+        }
+
+        function detectSuggestionType(text) {
+            const lower = text.toLowerCase();
+            if (lower.includes('surgery') || lower.includes('rhinoplasty') || lower.includes('implant')) {
+                return 'surgical';
+            } else if (lower.includes('filler') || lower.includes('botox') || lower.includes('injection')) {
+                return 'minimally-invasive';
+            }
+            return 'non-invasive';
+        }
+
+        function populateSuggestionsList() {
+            suggestionsList.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                suggestionsList.innerHTML = '<p style="color: #888; padding: 1rem;">No specific suggestions parsed. Review the analysis for recommendations.</p>';
+                return;
+            }
+
+            suggestions.forEach((suggestion, index) => {
+                const div = document.createElement('div');
+                div.className = `suggestion-item ${suggestion.selected ? 'selected' : ''}`;
+                div.dataset.index = index;
+                div.innerHTML = `
+                    <div class="suggestion-title">
+                        <span class="checkbox"></span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="suggestion-desc">${suggestion.description}</div>
+                    <span class="suggestion-type ${suggestion.type}">${suggestion.type.replace('-', ' ')}</span>
+                `;
+                div.addEventListener('click', () => toggleSuggestion(index));
+                suggestionsList.appendChild(div);
+            });
+
+            updateGenerateButton();
+        }
+
+        function toggleSuggestion(index) {
+            suggestions[index].selected = !suggestions[index].selected;
+            const items = suggestionsList.querySelectorAll('.suggestion-item');
+            items[index].classList.toggle('selected');
+            updateGenerateButton();
+        }
+
+        function updateGenerateButton() {
+            const hasSelection = suggestions.some(s => s.selected);
+            generatePreviewBtn.disabled = !hasSelection;
+        }
+
+        selectAllBtn.addEventListener('click', () => {
+            suggestions.forEach(s => s.selected = true);
+            populateSuggestionsList();
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            suggestions.forEach(s => s.selected = false);
+            populateSuggestionsList();
+            optimizedPhotoDiv.innerHTML = '<div class="preview-placeholder">Select improvements and click Generate</div>';
+        });
+
+        generatePreviewBtn.addEventListener('click', generateOptimizedPreview);
+
+        async function generateOptimizedPreview() {
+            const selectedSuggestions = suggestions.filter(s => s.selected);
+            if (selectedSuggestions.length === 0) return;
+
+            generatePreviewBtn.disabled = true;
+            generatePreviewBtn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+            optimizationStatus.className = 'optimization-status loading';
+            optimizationStatus.textContent = 'Generating optimized preview... This may take 30-60 seconds.';
+
+            optimizedPhotoDiv.innerHTML = `
+                <div class="preview-placeholder">
+                    <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
+                    <p>Creating visualization...</p>
+                </div>
+            `;
+
+            const formData = new FormData();
+            formData.append('image', frontFile);
+            formData.append('suggestions', JSON.stringify(selectedSuggestions.map(s => s.title + ': ' + s.description)));
+
+            try {
+                const response = await fetch('/generate-optimized', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    optimizedPhotoDiv.innerHTML = `<div class="preview-placeholder" style="color: #e94560;">${data.error}</div>`;
+                    optimizationStatus.className = 'optimization-status error';
+                    optimizationStatus.textContent = 'Generation failed. Try selecting fewer improvements.';
+                } else {
+                    optimizedPhotoDiv.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="Optimized preview">`;
+                    optimizationStatus.className = 'optimization-status success';
+                    optimizationStatus.textContent = `Preview generated with ${selectedSuggestions.length} improvement(s) applied.`;
+                }
+            } catch (error) {
+                optimizedPhotoDiv.innerHTML = '<div class="preview-placeholder" style="color: #e94560;">Failed to connect to server</div>';
+                optimizationStatus.className = 'optimization-status error';
+                optimizationStatus.textContent = 'Connection error. Please try again.';
+            }
+
+            generatePreviewBtn.disabled = false;
+            generatePreviewBtn.innerHTML = 'Generate Preview';
+        }
     </script>
 </body>
 </html>

@@ -23,7 +23,7 @@ VISION_MODEL_ID = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'html', 'md', 'csv', 'doc', 'docx', 'json'}
 IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
 
-FACIAL_ANALYSIS_PROMPT = """You are a clinical facial aesthetics analyst providing BRUTALLY HONEST assessments based on the golden ratio (phi = 1.618) and objective facial harmony metrics. You have been provided with {photo_description}. The person is {age} years old.
+FACIAL_ANALYSIS_PROMPT = """You are a clinical facial aesthetics analyst providing BRUTALLY HONEST assessments based on the golden ratio (phi = 1.618) and objective facial harmony metrics. You have been provided with {photo_description}. The person is {age} years old and weighs {weight} lbs.
 
 ## CRITICAL INSTRUCTIONS:
 - Be 100% HONEST and ACCURATE. Do NOT soften criticism or spare feelings.
@@ -84,10 +84,20 @@ Objective ratings for ALL facial focal points. Be HARSH but FAIR:
 
 ---
 
+### WEIGHT IMPACT ASSESSMENT
+
+At {weight} lbs, evaluate how weight affects facial appearance:
+- Would losing weight improve facial definition/jawline?
+- Is there excess facial fat obscuring bone structure?
+- Would gaining weight help if face is too gaunt?
+- Estimate ideal weight range for optimal facial aesthetics
+
+---
+
 ### REALISTIC FIXES FOR AGE {age}
 
 **What Can Actually Be Fixed:**
-- Non-invasive options (mewing, exercises, skincare, weight changes)
+- Non-invasive options (mewing, exercises, skincare, weight loss/gain)
 - Minimally invasive (fillers, Botox - be specific about placement)
 - Surgical options if warranted (be direct about what would help most)
 
@@ -206,6 +216,18 @@ def analyze_face():
     except ValueError:
         return jsonify({"error": "Age must be a number"}), 400
 
+    # Get weight (required)
+    weight = request.form.get("weight", "")
+    if not weight:
+        return jsonify({"error": "Weight is required for personalized recommendations"}), 400
+
+    try:
+        weight = int(weight)
+        if weight < 50 or weight > 500:
+            return jsonify({"error": "Please enter a valid weight"}), 400
+    except ValueError:
+        return jsonify({"error": "Weight must be a number"}), 400
+
     # Check for side photo (optional but recommended)
     side_image = request.files.get("side_image")
     has_side_photo = side_image and side_image.filename != "" and allowed_image(side_image.filename)
@@ -266,7 +288,7 @@ def analyze_face():
             photo_description = "both a front-facing photo and a side profile photo"
 
         # Add the analysis prompt
-        prompt = FACIAL_ANALYSIS_PROMPT.replace("{photo_description}", photo_description).replace("{age}", str(age))
+        prompt = FACIAL_ANALYSIS_PROMPT.replace("{photo_description}", photo_description).replace("{age}", str(age)).replace("{weight}", str(weight))
         content.append({
             "type": "text",
             "text": prompt
@@ -300,6 +322,124 @@ def analyze_face():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/generate-optimized", methods=["POST"])
+def generate_optimized():
+    """Generate an optimized version of the face with suggested improvements applied."""
+    if "image" not in request.files:
+        return jsonify({"error": "No image provided"}), 400
+
+    image_file = request.files["image"]
+    if image_file.filename == "":
+        return jsonify({"error": "No image selected"}), 400
+
+    suggestions_json = request.form.get("suggestions", "[]")
+    try:
+        suggestions = json.loads(suggestions_json)
+    except:
+        return jsonify({"error": "Invalid suggestions format"}), 400
+
+    if not suggestions:
+        return jsonify({"error": "No suggestions selected"}), 400
+
+    try:
+        # Read and encode original image
+        image_data = image_file.read()
+        image_base64 = base64.b64encode(image_data).decode("utf-8")
+
+        # Build the modification prompt
+        improvements = "\n".join([f"- {s}" for s in suggestions])
+        modification_prompt = f"""Transform this face photo to show realistic improvements:
+
+{improvements}
+
+IMPORTANT GUIDELINES:
+- Keep the person recognizable - same identity, just improved
+- Make subtle, realistic changes - not dramatic transformations
+- Maintain natural skin texture and lighting
+- Apply changes that would result from the suggested improvements
+- Keep the same pose, expression, and background
+- Make it look like a realistic "after" photo, not AI-generated"""
+
+        # Use Titan Image Generator for image-to-image transformation
+        titan_body = json.dumps({
+            "taskType": "IMAGE_VARIATION",
+            "imageVariationParams": {
+                "images": [image_base64],
+                "text": modification_prompt,
+                "similarityStrength": 0.7  # Keep it similar but allow changes
+            },
+            "imageGenerationConfig": {
+                "numberOfImages": 1,
+                "width": 512,
+                "height": 512,
+                "cfgScale": 8.0
+            }
+        })
+
+        response = bedrock_runtime.invoke_model(
+            modelId="amazon.titan-image-generator-v1",
+            contentType="application/json",
+            accept="application/json",
+            body=titan_body
+        )
+
+        response_body = json.loads(response["body"].read())
+
+        if "images" in response_body and len(response_body["images"]) > 0:
+            generated_image = response_body["images"][0]
+            return jsonify({
+                "status": "success",
+                "image": generated_image
+            })
+        else:
+            return jsonify({"error": "No image generated"}), 500
+
+    except Exception as e:
+        error_msg = str(e)
+        # If Titan fails, try with Stable Diffusion
+        if "ValidationException" in error_msg or "AccessDeniedException" in error_msg:
+            try:
+                # Fallback to Stable Diffusion SDXL
+                sd_body = json.dumps({
+                    "text_prompts": [
+                        {
+                            "text": f"Professional portrait photo, same person with subtle facial improvements: {', '.join(suggestions[:5])}. Photorealistic, natural lighting, high quality",
+                            "weight": 1.0
+                        },
+                        {
+                            "text": "cartoon, anime, drawing, painting, unrealistic, distorted, ugly",
+                            "weight": -1.0
+                        }
+                    ],
+                    "init_image": image_base64,
+                    "init_image_mode": "IMAGE_STRENGTH",
+                    "image_strength": 0.35,
+                    "cfg_scale": 7,
+                    "samples": 1,
+                    "steps": 30
+                })
+
+                response = bedrock_runtime.invoke_model(
+                    modelId="stability.stable-diffusion-xl-v1",
+                    contentType="application/json",
+                    accept="application/json",
+                    body=sd_body
+                )
+
+                response_body = json.loads(response["body"].read())
+
+                if "artifacts" in response_body and len(response_body["artifacts"]) > 0:
+                    generated_image = response_body["artifacts"][0]["base64"]
+                    return jsonify({
+                        "status": "success",
+                        "image": generated_image
+                    })
+            except Exception as sd_error:
+                return jsonify({"error": f"Image generation not available. Enable Titan Image Generator or Stable Diffusion in AWS Bedrock console. Error: {str(sd_error)}"}), 500
+
+        return jsonify({"error": f"Image generation failed: {error_msg}"}), 500
 
 
 @app.route("/upload", methods=["POST"])
