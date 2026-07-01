@@ -1,16 +1,24 @@
 import json
 import base64
 import boto3
+from botocore.config import Config
 from flask import Flask, request, jsonify, render_template
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Configure longer timeouts for Bedrock API calls
+bedrock_config = Config(
+    read_timeout=120,  # 2 minutes read timeout
+    connect_timeout=10,
+    retries={'max_attempts': 2}
+)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 
 # AWS clients
 bedrock_agent = boto3.client("bedrock-agent-runtime", region_name="us-east-1")
 bedrock_agent_client = boto3.client("bedrock-agent", region_name="us-east-1")
-bedrock_runtime = boto3.client("bedrock-runtime", region_name="us-east-1")
+bedrock_runtime = boto3.client("bedrock-runtime", region_name="us-east-1", config=bedrock_config)
 s3 = boto3.client("s3", region_name="us-east-1")
 
 # Configuration
@@ -356,8 +364,10 @@ def analyze_face():
 
     except Exception as e:
         import traceback
+        import sys
         error_details = traceback.format_exc()
-        print(f"Error in analyze_face: {error_details}")
+        print(f"Error in analyze_face: {error_details}", file=sys.stderr)
+        print(f"Error in analyze_face: {error_details}", flush=True)
         return jsonify({"error": f"Analysis failed: {str(e)}"}), 500
 
 
