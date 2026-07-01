@@ -121,6 +121,40 @@ State any uncomfortable realities the person needs to hear to make real progress
 
 ---
 
+### EXPERIMENTAL & EMERGING SOLUTIONS
+
+List cutting-edge or experimental approaches that show promise but aren't yet fully accepted by mainstream science. These are NOT pseudoscience or scams, but legitimate emerging treatments and techniques being researched:
+
+**Emerging Non-Invasive:**
+- Mewing / orthotropics (tongue posture for facial development)
+- Red light therapy / photobiomodulation for skin
+- Microcurrent facial toning devices
+- Face yoga / facial exercises with emerging research
+- Bone conduction / vibration therapy
+
+**Experimental Medical:**
+- PRP (Platelet-Rich Plasma) therapy variations
+- Exosome therapy for skin rejuvenation
+- Stem cell facial treatments
+- Peptide therapies (GHK-Cu, BPC-157, etc.)
+- Fat transfer techniques with stem cell enrichment
+
+**Research-Stage:**
+- Gene therapy approaches (future)
+- Bone remodeling stimulation techniques
+- Bioelectric facial sculpting
+- Regenerative medicine approaches
+
+For each relevant suggestion, note:
+- Current research status
+- Potential benefits for THIS person's specific issues
+- Risks and unknowns
+- Where to find legitimate practitioners/products
+
+**DISCLAIMER:** These are experimental. Results vary. Do your own research. Not FDA approved for these uses.
+
+---
+
 Remember: The user explicitly requested brutal honesty. Sugarcoating does them a disservice. They want to IMPROVE, and that requires knowing EXACTLY what's wrong. Be clinical, be direct, be accurate."""
 
 

@@ -818,6 +818,204 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Skeleton Scanning Animation */
+        .scanning-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .skeleton-scanner {
+            position: relative;
+            width: 200px;
+            height: 350px;
+            margin-bottom: 1.5rem;
+        }
+
+        .skeleton-figure {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .skeleton-figure svg {
+            width: 100%;
+            height: 100%;
+            stroke: #0f3460;
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(233, 69, 96, 0.3));
+        }
+
+        .skeleton-figure svg .bone {
+            stroke: #e94560;
+            opacity: 0.6;
+            animation: bonePulse 2s ease-in-out infinite;
+        }
+
+        .skeleton-figure svg .bone:nth-child(odd) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes bonePulse {
+            0%, 100% { opacity: 0.4; stroke: #e94560; }
+            50% { opacity: 1; stroke: #ff6b6b; }
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff88, #00ff88, transparent);
+            box-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
+            animation: scanMove 2s ease-in-out infinite;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0; opacity: 1; }
+            50% { top: 100%; opacity: 1; }
+            51% { opacity: 0; }
+            52% { top: 0; opacity: 0; }
+            53% { opacity: 1; }
+            100% { top: 0; opacity: 1; }
+        }
+
+        .scan-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .scanning-text {
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            text-align: center;
+            animation: textFlicker 0.5s ease-in-out infinite alternate;
+        }
+
+        .scanning-text .dots {
+            display: inline-block;
+            width: 24px;
+            text-align: left;
+        }
+
+        @keyframes textFlicker {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .scan-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .scan-stat {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 0.3rem 0.5rem;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .scan-stat .label {
+            color: #00ff88;
+        }
+
+        /* Rating Reveal Animation */
+        .rating-reveal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .rating-reveal .rating-label {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .rating-reveal .rating-number {
+            font-size: 8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #e94560, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            animation: ratingPulse 1s ease-in-out infinite;
+        }
+
+        .rating-reveal .rating-scale {
+            font-size: 2rem;
+            color: #555;
+            margin-top: 0.5rem;
+        }
+
+        .rating-reveal .rating-descriptor {
+            font-size: 1.5rem;
+            color: #e94560;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes ratingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .rating-countdown {
+            margin-top: 2rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .rating-countdown .countdown-bar {
+            width: 200px;
+            height: 4px;
+            background: #0f3460;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .rating-countdown .countdown-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #d4af37);
+            animation: countdownShrink 5s linear forwards;
+        }
+
+        @keyframes countdownShrink {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+
         @media (max-width: 768px) {
             #sidebar {
                 position: absolute;
@@ -1432,6 +1630,96 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
         ageInput.addEventListener('input', checkCanAnalyze);
         weightInput.addEventListener('input', checkCanAnalyze);
 
+        // Scanning animation functions
+        let scanningInterval = null;
+        let dotsInterval = null;
+
+        function startScanningAnimation() {
+            let dotCount = 0;
+            dotsInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                const dotsEl = document.getElementById('scan-dots');
+                if (dotsEl) dotsEl.textContent = '.'.repeat(dotCount || 1);
+            }, 300);
+
+            scanningInterval = setInterval(() => {
+                const symEl = document.getElementById('stat-sym');
+                const ratioEl = document.getElementById('stat-ratio');
+                const harmEl = document.getElementById('stat-harm');
+                const ptsEl = document.getElementById('stat-pts');
+
+                if (symEl) symEl.textContent = (85 + Math.random() * 10).toFixed(1) + '%';
+                if (ratioEl) ratioEl.textContent = (1.5 + Math.random() * 0.2).toFixed(3);
+                if (harmEl) harmEl.textContent = (70 + Math.random() * 20).toFixed(1) + '%';
+                if (ptsEl) ptsEl.textContent = Math.floor(50 + Math.random() * 30);
+            }, 150);
+        }
+
+        function stopScanningAnimation() {
+            if (scanningInterval) clearInterval(scanningInterval);
+            if (dotsInterval) clearInterval(dotsInterval);
+            scanningInterval = null;
+            dotsInterval = null;
+        }
+
+        function extractOverallRating(analysisText) {
+            // Try to find "OVERALL FACIAL SCORE: X/10" or "Overall Harmony: X/10"
+            const patterns = [
+                /OVERALL FACIAL SCORE:\s*(\d+(?:\.\d+)?)\s*\/\s*10/i,
+                /Overall Harmony[^:]*:\s*(\d+(?:\.\d+)?)\s*\/\s*10/i,
+                /Overall[^:]*:\s*(\d+(?:\.\d+)?)\s*\/\s*10/i
+            ];
+
+            for (const pattern of patterns) {
+                const match = analysisText.match(pattern);
+                if (match) {
+                    return parseFloat(match[1]);
+                }
+            }
+
+            // Fallback: calculate average from feature ratings
+            const ratingMatches = analysisText.match(/(\d+(?:\.\d+)?)\s*\/\s*10/g);
+            if (ratingMatches && ratingMatches.length > 0) {
+                const ratings = ratingMatches.map(r => parseFloat(r.split('/')[0]));
+                const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+                return Math.round(avg * 10) / 10;
+            }
+
+            return 5.0; // Default fallback
+        }
+
+        function getRatingDescriptor(rating) {
+            if (rating >= 9) return "EXCEPTIONAL";
+            if (rating >= 8) return "EXCELLENT";
+            if (rating >= 7) return "ABOVE AVERAGE";
+            if (rating >= 6) return "AVERAGE";
+            if (rating >= 5) return "BELOW AVERAGE";
+            if (rating >= 4) return "NEEDS WORK";
+            if (rating >= 3) return "SIGNIFICANT ISSUES";
+            return "MAJOR IMPROVEMENTS NEEDED";
+        }
+
+        function showRatingReveal(rating, callback) {
+            const descriptor = getRatingDescriptor(rating);
+
+            analysisResult.innerHTML = `
+                <div class="rating-reveal">
+                    <div class="rating-label">Overall Facial Score</div>
+                    <div class="rating-number">${rating.toFixed(1)}</div>
+                    <div class="rating-scale">/ 10</div>
+                    <div class="rating-descriptor">${descriptor}</div>
+                    <div class="rating-countdown">
+                        <span>Full analysis in 5 seconds...</span>
+                        <div class="countdown-bar">
+                            <div class="countdown-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(callback, 5000);
+        }
+
         async function analyzeFace() {
             if (!frontFile || !ageInput.value || !weightInput.value) return;
 
@@ -1440,13 +1728,78 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
 
             const photoCount = sideFile ? 'both photos' : 'your photo';
             analysisResult.innerHTML = `
-                <div class="analysis-placeholder">
-                    <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
-                    <h2>Analyzing ${photoCount}...</h2>
-                    <p>This may take 20-40 seconds</p>
-                    <small>Generating detailed ratings and recommendations</small>
+                <div class="scanning-container">
+                    <div class="skeleton-scanner">
+                        <div class="scan-grid"></div>
+                        <div class="skeleton-figure">
+                            <svg viewBox="0 0 100 175">
+                                <!-- Skull -->
+                                <ellipse class="bone" cx="50" cy="15" rx="18" ry="15"/>
+                                <circle class="bone" cx="43" cy="12" r="3"/>
+                                <circle class="bone" cx="57" cy="12" r="3"/>
+                                <path class="bone" d="M44 22 L50 26 L56 22"/>
+                                <path class="bone" d="M42 28 Q50 32 58 28"/>
+
+                                <!-- Spine -->
+                                <line class="bone" x1="50" y1="30" x2="50" y2="85"/>
+                                <ellipse class="bone" cx="50" cy="35" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="42" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="49" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="56" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="63" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="70" rx="3" ry="2"/>
+                                <ellipse class="bone" cx="50" cy="77" rx="3" ry="2"/>
+
+                                <!-- Ribcage -->
+                                <path class="bone" d="M50 35 Q30 40 28 50 Q30 55 50 55"/>
+                                <path class="bone" d="M50 35 Q70 40 72 50 Q70 55 50 55"/>
+                                <path class="bone" d="M50 42 Q32 47 30 55 Q32 60 50 60"/>
+                                <path class="bone" d="M50 42 Q68 47 70 55 Q68 60 50 60"/>
+                                <path class="bone" d="M50 49 Q35 52 33 58 Q35 63 50 65"/>
+                                <path class="bone" d="M50 49 Q65 52 67 58 Q65 63 50 65"/>
+
+                                <!-- Shoulders & Arms -->
+                                <line class="bone" x1="28" y1="35" x2="50" y2="35"/>
+                                <line class="bone" x1="72" y1="35" x2="50" y2="35"/>
+                                <line class="bone" x1="28" y1="35" x2="20" y2="60"/>
+                                <line class="bone" x1="72" y1="35" x2="80" y2="60"/>
+                                <line class="bone" x1="20" y1="60" x2="15" y2="85"/>
+                                <line class="bone" x1="80" y1="60" x2="85" y2="85"/>
+
+                                <!-- Hands -->
+                                <circle class="bone" cx="15" cy="88" r="4"/>
+                                <circle class="bone" cx="85" cy="88" r="4"/>
+
+                                <!-- Pelvis -->
+                                <path class="bone" d="M35 85 Q50 80 65 85 Q65 95 50 100 Q35 95 35 85"/>
+
+                                <!-- Legs -->
+                                <line class="bone" x1="40" y1="95" x2="35" y2="135"/>
+                                <line class="bone" x1="60" y1="95" x2="65" y2="135"/>
+                                <line class="bone" x1="35" y1="135" x2="33" y2="165"/>
+                                <line class="bone" x1="65" y1="135" x2="67" y2="165"/>
+
+                                <!-- Feet -->
+                                <ellipse class="bone" cx="30" cy="168" rx="6" ry="3"/>
+                                <ellipse class="bone" cx="70" cy="168" rx="6" ry="3"/>
+                            </svg>
+                        </div>
+                        <div class="scan-line"></div>
+                    </div>
+                    <div class="scanning-text">
+                        ANALYZING FACIAL STRUCTURE<span class="dots" id="scan-dots">...</span>
+                    </div>
+                    <div class="scan-stats">
+                        <div class="scan-stat"><span class="label">SYMMETRY:</span> <span id="stat-sym">---%</span></div>
+                        <div class="scan-stat"><span class="label">RATIO:</span> <span id="stat-ratio">-.---</span></div>
+                        <div class="scan-stat"><span class="label">HARMONY:</span> <span id="stat-harm">---%</span></div>
+                        <div class="scan-stat"><span class="label">POINTS:</span> <span id="stat-pts">---</span></div>
+                    </div>
                 </div>
             `;
+
+            // Animate the scanning stats
+            startScanningAnimation();
 
             const formData = new FormData();
             formData.append('front_image', frontFile);
@@ -1464,6 +1817,8 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
 
                 const data = await response.json();
 
+                stopScanningAnimation();
+
                 if (data.error) {
                     analysisResult.innerHTML = `
                         <div class="analysis-placeholder">
@@ -1476,25 +1831,32 @@ Or switch to the "Face Analysis" tab to upload a photo for personalized recommen
                     // Store analysis data
                     analysisData = data;
 
-                    // Format the analysis with markdown-like styling
-                    const formattedAnalysis = formatAnalysis(data.analysis);
-                    analysisResult.innerHTML = `<div class="analysis-content">${formattedAnalysis}</div>`;
+                    // Extract overall rating from analysis
+                    const overallRating = extractOverallRating(data.analysis);
 
-                    // Parse suggestions and populate the Optimized tab
-                    parseSuggestions(data.analysis);
-                    populateSuggestionsList();
+                    // Show rating reveal for 5 seconds
+                    showRatingReveal(overallRating, () => {
+                        // Format the analysis with markdown-like styling
+                        const formattedAnalysis = formatAnalysis(data.analysis);
+                        analysisResult.innerHTML = `<div class="analysis-content">${formattedAnalysis}</div>`;
 
-                    // Set original photo in Optimized tab
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        originalPhotoDiv.innerHTML = `<img src="${e.target.result}" alt="Original photo">`;
-                    };
-                    reader.readAsDataURL(frontFile);
+                        // Parse suggestions and populate the Optimized tab
+                        parseSuggestions(data.analysis);
+                        populateSuggestionsList();
 
-                    // Unlock the Optimized tab
-                    unlockOptimizedTab();
+                        // Set original photo in Optimized tab
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            originalPhotoDiv.innerHTML = `<img src="${e.target.result}" alt="Original photo">`;
+                        };
+                        reader.readAsDataURL(frontFile);
+
+                        // Unlock the Optimized tab
+                        unlockOptimizedTab();
+                    });
                 }
             } catch (error) {
+                stopScanningAnimation();
                 analysisResult.innerHTML = `
                     <div class="analysis-placeholder">
                         <div class="icon" style="color: #e94560;">⚠️</div>
